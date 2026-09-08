@@ -1,0 +1,251 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Deep Learning 기초: Neuron에서 경사하강법까지 | Seokchan Hong </title> <meta name="author" content="Seokchan Hong"> <meta name="description" content="간단한 예시와 수식으로 Neural Network의 계산과 학습 과정을 정리한다."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=3116ba77db9ee1581d05bb3e86fbf7f1"> <link rel="canonical" href="https://redstonecold.github.io/blog/2026/deep-learning-fundamentals/"> <script src="/assets/js/theme.js?v=5286c3e4c334d0ecb8fc0c40ff4fa7ec"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Seokchan</span> Hong </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Deep Learning 기초: Neuron에서 경사하강법까지</h1> <p class="post-meta"> Created on September 08, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/ai"> <i class="fa-solid fa-hashtag fa-sm"></i> ai</a>   <a href="/blog/tag/deep-learning"> <i class="fa-solid fa-hashtag fa-sm"></i> deep-learning</a>   <a href="/blog/tag/study"> <i class="fa-solid fa-hashtag fa-sm"></i> study</a>   ·   <a href="/blog/category/ai-deeplearning"> <i class="fa-solid fa-tag fa-sm"></i> AI/DeepLearning</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h2 id="초록">초록</h2> <p>Neural Network는 Input을 받아 Output을 계산한다. 학습은 예측이 정답에 가까워지도록 Weight(가중치)와 Bias를 조정하는 과정이다.</p> <p>손글씨 숫자 분류를 예로 들어 계산 흐름을 살펴본다. Neuron의 계산을 먼저 살펴본다. 이어서 Cost(Loss)와 Gradient를 정리한다. 각 수식 아래에서 기호와 계산 순서를 설명한다.</p> <h2 id="1-neuron과-activation">1. Neuron과 Activation</h2> <p>Neuron은 숫자 하나를 담는 계산 단위로 이해할 수 있다. 이 숫자가 Activation이다. Activation은 해당 Neuron의 반응 정도를 나타낸다.</p> <p>여기서 다룰 예시는 손글씨 숫자 분류이다. Input 이미지는 28 × 28 Pixel로 구성된다. 따라서 Input에는 784개의 Neuron을 둔다. 각 Neuron은 Pixel 하나의 값을 전달한다.</p> <p>Output에는 10개의 Neuron을 둔다. 각각 숫자 0부터 9에 대응한다. Output이 큰 숫자를 모델의 예측으로 선택한다.</p> <p>단, Activation이 0과 1 사이에 있다는 것만으로 확률이 되는 것은 아니다. 이 글에서는 우선 각 숫자에 대한 모델의 반응값으로 이해한다.</p> <p><img src="/assets/img/deep-learning-fundamentals/pixels-to-prediction.png" alt="Pixel에서 숫자 예측까지"></p> <p><strong>그림 설명.</strong> 그림의 격자와 Neuron 수는 이해를 위해 단순화했다. 실제 Input은 28 × 28 Pixel이다. 왼쪽의 이미지를 Pixel별 밝기 값으로 펼친다. Network는 이 값들을 받아 숫자별 Output을 계산한다. 주황색 막대가 가장 큰 숫자 3이 예측 결과이다.</p> <h2 id="2-hidden-layer와-패턴">2. Hidden Layer와 패턴</h2> <p>Input과 Output 사이에는 Hidden Layer가 있다. 이 예시에는 Hidden Layer가 두 개 있다.</p> <p>각 Layer는 이전 Layer의 Activation을 받아 계산한다. 앞쪽 Layer가 단순한 패턴을, 뒤쪽 Layer가 그 조합을 다룬다고 생각할 수 있다. 숫자 이미지에서는 짧은 획과 획의 조합을 예로 들 수 있다.</p> <p>이는 구조를 이해하기 위한 직관이다. 개별 Neuron이 반드시 특정 획을 학습한다는 뜻은 아니다. 또한 Hidden Layer의 개수가 항상 두 개로 고정되는 것도 아니다.</p> <h2 id="3-weight가중치와-weighted-sum">3. Weight(가중치)와 Weighted Sum</h2> <p>Neuron은 이전 Layer의 Activation에 Weight(가중치)를 곱한다. 그 결과를 모두 더한다.</p> \[w_1a_1+w_2a_2+w_3a_3+\cdots+w_na_n\] <p>이 값이 Weighted Sum이다. 여기서 a는 이전 Neuron의 Activation이다. w는 각 연결의 Weight(가중치)이다.</p> <p>Weight(가중치)는 각 Activation이 계산에 기여하는 정도를 조절한다. 양수인지 음수인지에 따라서도 기여 방향이 달라진다.</p> <p><img src="/assets/img/deep-learning-fundamentals/neuron-computation.png" alt="하나의 Neuron이 계산하는 순서"></p> <p><strong>그림 설명.</strong> 각 Input에 Weight를 곱한 뒤 더한다. Bias를 더하고 Activation Function을 통과시키면 Output이 나온다. 화살표를 왼쪽부터 따라가 보자.</p> <h2 id="4-sigmoid와-bias">4. Sigmoid와 Bias</h2> <h3 id="41-sigmoid">4.1 Sigmoid</h3> <p>Weighted Sum을 그대로 전달하지 않고 Activation Function에 넣는다. 먼저 살펴볼 함수는 Sigmoid이다.</p> \[\sigma(x)=\frac{1}{1+e^{-x}}\] <p>Sigmoid는 값을 0과 1 사이로 바꾼다. 큰 음수는 0에 가까워진다. 큰 양수는 1에 가까워진다. x가 0이면 결과는 0.5이다.</p> <p>이때 x는 Sigmoid에 들어가는 값이다. 이미지 전체를 뜻하는 기호는 아니다.</p> <h3 id="42-bias">4.2 Bias</h3> <p>Weighted Sum에서 10을 빼는 경우를 생각해 보자.</p> \[w_1a_1+w_2a_2+w_3a_3+\cdots+w_na_n-10\] <p>여기서 −10이 더해지는 Bias이다. Weighted Sum이 10이면 Sigmoid에 들어가는 값은 0이다. 따라서 Activation은 0.5가 된다.</p> <p>Bias는 Neuron이 반응하는 기준을 옮긴다. Sigmoid는 부드럽게 변하므로 특정 기준에서 갑자기 켜지는 스위치는 아니다.</p> <p>Bias는 더하는 값으로 정의할 수 있다. 아래 행렬식에서는 Bias를 더한다. 이 표기에서 위 예시의 Bias는 −10이다.</p> <h2 id="5-layer-전체의-계산">5. Layer 전체의 계산</h2> <p>여러 Neuron의 계산을 한 번에 묶으면 다음과 같다.</p> \[a^{(1)}=\sigma\left(Wa^{(0)}+b\right)\] <p>이 식은 Layer 전체의 계산을 한 줄로 표현한다.</p> <ul> <li>a⁽⁰⁾: 이전 Layer의 Activation을 모은 vector이다.</li> <li>W: Weight(가중치)를 모은 행렬이다.</li> <li>b: Bias를 모은 vector이다.</li> <li>a⁽¹⁾: 계산을 마친 다음 Layer의 Activation이다.</li> </ul> <p>먼저 W와 a⁽⁰⁾을 곱한다. 이어서 b를 더한다. 마지막으로 각 성분에 Sigmoid를 적용한다.</p> \[\sigma\left( \begin{bmatrix} x\\y\\z \end{bmatrix} \right) = \begin{bmatrix} \sigma(x)\\\sigma(y)\\\sigma(z) \end{bmatrix}\] <p>Sigmoid는 vector 전체를 숫자 하나로 바꾸지 않는다. x, y, z에 각각 적용된다.</p> <p>이 계산을 Input에서 Output까지 반복한다. 이 과정이 Forward Propagation이다.</p> <h2 id="6-relu">6. ReLU</h2> <p>Activation Function에는 ReLU도 있다. ReLU는 Rectified Linear Unit의 약자이다.</p> \[\operatorname{ReLU}(a)=\max(0,a)\] <p>a가 음수이면 0을 출력한다. 양수이면 a를 그대로 출력한다.</p> <p>따라서 ReLU의 Activation은 1보다 클 수 있다. 모든 Activation이 0과 1 사이에 있는 것은 아니다. 범위는 사용하는 Activation Function에 따라 달라진다.</p> <p><img src="/assets/img/deep-learning-fundamentals/layers-and-activation.png" alt="Layer 사이의 흐름과 Activation Function"></p> <p><strong>그림 설명.</strong> 왼쪽 그림은 이해를 위해 Neuron 수를 줄인 구조이다. 정보는 왼쪽에서 오른쪽으로 전달된다. 오른쪽은 Sigmoid와 ReLU가 들어온 값을 바꾸는 방식이다.</p> <h2 id="7-costloss-예측과-정답의-차이">7. Cost(Loss): 예측과 정답의 차이</h2> <p>학습 초기의 예측은 정답과 다를 수 있다. 이 차이를 숫자로 나타낸 것이 Cost(Loss)이다.</p> <p>각 Output과 정답의 차이를 제곱한다. 그 값을 모두 더한다. 아래는 숫자 3을 분류할 때의 계산 일부이다.</p> \[\begin{aligned} &amp;(0.43-0.00)^2+\cdots\\ &amp;\quad +(0.88-1.00)^2+\cdots \end{aligned}\] <p>정답은 숫자 3이다. 숫자 3에 대응하는 목표값은 1이다. 나머지 숫자의 목표값은 0이다.</p> <p>따라서 정답에 해당하는 Output은 1에 가까워야 한다. 나머지 Output은 0에 가까워야 한다. 예측과 목표의 차이가 커질수록 Cost가 커진다.</p> <p>전체 Cost를 계산할 때는 생략된 항을 포함해 10개 Output의 제곱오차를 모두 더한다.</p> <h2 id="8-neural-network와-cost-function">8. Neural Network와 Cost Function</h2> <p>같은 Network를 두 관점에서 살펴보자.</p> <table> <thead> <tr> <th>구분</th> <th>Input</th> <th>Output</th> </tr> </thead> <tbody> <tr> <td>Neural Network</td> <td>784개의 Pixel 값</td> <td>10개의 숫자</td> </tr> <tr> <td>Cost Function</td> <td>13,002개의 Weight(가중치)와 Bias</td> <td>Cost 하나</td> </tr> </tbody> </table> <p>Neural Network는 현재 Weight(가중치)와 Bias로 예측을 계산한다. Cost Function은 그 설정이 얼마나 좋은지 평가한다. 이때 Training Dataset을 기준으로 예측과 정답을 비교한다.</p> <p>13,002개는 이 예시 Network의 Parameter 수이다. 모든 Neural Network가 같은 수의 Parameter를 갖는 것은 아니다.</p> <p>Training Dataset은 Parameter를 조정하는 데 사용한다. Test Dataset은 학습에 사용하지 않은 데이터에서 성능을 확인하는 데 사용한다.</p> <h2 id="9-gradient와-경사하강법gradient-descent">9. Gradient와 경사하강법(Gradient Descent)</h2> <h3 id="91-cost를-줄이는-방향">9.1 Cost를 줄이는 방향</h3> <p>Weight(가중치)와 Bias를 바꾸면 Cost도 변한다. 학습에서는 Cost가 작아지는 방향을 찾는다.</p> <p>먼저 하나의 Weight에 대한 Cost 그래프를 생각해 보자. 현재 위치의 기울기를 보면 어느 방향으로 움직일지 판단할 수 있다.</p> <p>여러 Parameter를 함께 다룰 때 사용하는 것이 Gradient이다. Gradient는 각 Parameter에 대한 편미분을 모은 값이다.</p> <h3 id="92-음의-gradient">9.2 음의 Gradient</h3> <p>모든 Weight(가중치)와 Bias를 W vector로 묶어 표현하자. 이때 Cost를 줄이는 국소 방향은 다음과 같다.</p> \[-\nabla C(\vec{W})\] <p>여기서 W vector는 Bias까지 포함한다. 앞의 Layer 계산식에서 사용한 Weight 행렬 W와는 역할이 다르다.</p> <p>Gradient는 Cost가 가장 빠르게 증가하는 국소 방향을 나타낸다. 음의 Gradient는 반대 방향이다. 이는 유클리드 거리 기준의 설명이다.</p> <p>각 성분의 부호는 해당 Parameter를 늘릴지 줄일지 알려 준다. 크기는 현재 위치에서의 변화 민감도를 나타낸다.</p> <p>음의 Gradient 방향으로 조금 이동한다. 새 위치에서 다시 Gradient를 계산한다. 이 과정을 반복하는 방법이 경사하강법(Gradient Descent)이다.</p> <p>한 번에 너무 멀리 이동하면 Cost가 오히려 커질 수 있다. 따라서 이동 크기도 중요하다.</p> <h3 id="93-두-변수로-살펴보기">9.3 두 변수로 살펴보기</h3> <p>다음 Cost Function을 생각해 보자.</p> \[C(x,y)=\frac{3}{2}x^2+\frac{1}{2}y^2\] <p>이 함수에서 x와 y는 조정할 두 좌표이다. 현재 위치를 (1, 1)로 두면 Gradient는 다음과 같다.</p> \[\nabla C(1,1)= \begin{bmatrix} 3\\1 \end{bmatrix}\] <p>현재 위치에서 x에 대한 편미분은 3이다. y에 대한 편미분은 1이다. 따라서 음의 Gradient 방향에서는 두 값 모두 줄인다. x 방향의 변화량은 y 방향보다 크게 잡힌다.</p> <p>이는 현재 위치의 국소적인 설명이다. x가 언제나 y보다 세 배 중요하다는 뜻은 아니다.</p> <h3 id="94-local-minimum과-global-minimum">9.4 Local Minimum과 Global Minimum</h3> <p>Local Minimum은 주변보다 낮은 지점이다. Global Minimum은 전체에서 가장 낮은 지점이다.</p> <p>경사하강법(Gradient Descent)이 항상 Global Minimum을 찾는 것은 아니다. 또한 Gradient가 0인 지점이 반드시 최솟값인 것도 아니다. 학습 과정에서는 Cost와 평가 성능을 함께 확인해야 한다.</p> <p><img src="/assets/img/deep-learning-fundamentals/loss-and-gradient.png" alt="예측 오차와 Cost를 줄이는 과정"></p> <p><strong>그림 설명.</strong> 왼쪽은 숫자 0–4의 Output만 표시한 예시이다. 청록색은 Prediction, 주황색은 Target이다. Target이 0인 막대는 높이가 없어 보이지 않는다. 두 막대의 차이가 작아지는 것이 목표이다. 오른쪽은 하나의 Weight만 바꾼 단순한 Cost 그래프이다. 점과 화살표는 Cost가 낮아지는 쪽으로 조금씩 이동하는 과정을 보여 준다.</p> <h2 id="10-이번-학습의-연결">10. 이번 학습의 연결</h2> <p>Neuron은 Weighted Sum과 Bias를 계산한다. Activation Function은 그 결과를 변환한다. 이 계산이 Layer를 따라 반복되면 Output이 나온다.</p> <p>Cost(Loss)는 Output과 정답의 차이를 나타낸다. Gradient는 Parameter를 어느 방향으로 조정할지 알려 준다. 경사하강법(Gradient Descent)은 이 정보를 이용해 Cost를 줄여 나간다.</p> <p>다음 학습 주제는 역전파이다. 여러 Layer에 걸친 Gradient를 어떻게 계산하는지 살펴볼 예정이다.</p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoy Reading This Article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/chapter-01-multilayer-perceptron-mlp/">Chapter 01. Multilayer Perceptron (MLP)</a> </li> </ul> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Seokchan Hong. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-deep-learning-기초-neuron에서-경사하강법까지",
+        
+          title: "Deep Learning 기초: Neuron에서 경사하강법까지",
+        
+        description: "간단한 예시와 수식으로 Neural Network의 계산과 학습 과정을 정리한다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deep-learning-fundamentals/";
+          
+        },
+      },{id: "post-chapter-01-multilayer-perceptron-mlp",
+        
+          title: "Chapter 01. Multilayer Perceptron (MLP)",
+        
+        description: "이번 학습에서는 Multilayer Perceptron의 구조와 학습 원리를 이론적·수학적 관점에서 살펴보고, 주요 개념과 동작 과정을 자신의 언어로 설명할 수 있는 수준까지 이해하는 것을 목표로 합니다. 특히 Neural Network가 입력으로부터 출력을 계산하는 과정과, 예측 오차를 이용하여 Weight와 Bias를 업데이트하는 과정을 수식 수준에서 이해하는 것을 목표로 합니다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/chapter-01-multilayer-perceptron-mlp/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "projects-project-3-with-very-long-name",
+          title: 'project 3 with very long name',
+          description: "a project that redirects to another website",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_project/";
+            },},{id: "projects-project-4",
+          title: 'project 4',
+          description: "another without an image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_project/";
+            },},{id: "projects-project-5",
+          title: 'project 5',
+          description: "a project with a background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_project/";
+            },},{id: "projects-project-6",
+          title: 'project 6',
+          description: "a project with no image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_project/";
+            },},{id: "projects-project-7",
+          title: 'project 7',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/7_project/";
+            },},{id: "projects-project-8",
+          title: 'project 8',
+          description: "an other project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/8_project/";
+            },},{id: "projects-project-9",
+          title: 'project 9',
+          description: "another project with an image 🎉",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/9_project/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/example_pdf.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%75@%65%78%61%6D%70%6C%65.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-inspire',
+        title: 'Inspire HEP',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://inspirehep.net/authors/1010907", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-scholar',
+        title: 'Google Scholar',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://scholar.google.com/citations?user=qc6CJjYAAAAJ", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.alberteinstein.com/", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
