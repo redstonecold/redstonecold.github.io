@@ -24,7 +24,7 @@ Output에는 10개의 Neuron을 둔다. 각각 숫자 0부터 9에 대응한다.
 
 단, Activation이 0과 1 사이에 있다는 것만으로 확률이 되는 것은 아니다. 이 글에서는 우선 각 숫자에 대한 모델의 반응값으로 이해한다.
 
-![Pixel에서 숫자 예측까지](/assets/img/deep-learning-fundamentals/pixels-to-prediction.png)
+![Pixel에서 숫자 예측까지](/assets/img/deep-learning-fundamentals/pixels-to-prediction.png){: style="max-width: 100%; height: auto;"}
 
 **그림 설명.** 그림의 격자와 Neuron 수는 이해를 위해 단순화했다. 실제 Input은 28 × 28 Pixel이다. 왼쪽의 이미지를 Pixel별 밝기 값으로 펼친다. Network는 이 값들을 받아 숫자별 Output을 계산한다. 주황색 막대가 가장 큰 숫자 3이 예측 결과이다.
 
@@ -48,7 +48,7 @@ $$
 
 Weight(가중치)는 각 Activation이 계산에 기여하는 정도를 조절한다. 양수인지 음수인지에 따라서도 기여 방향이 달라진다.
 
-![하나의 Neuron이 계산하는 순서](/assets/img/deep-learning-fundamentals/neuron-computation.png)
+![하나의 Neuron이 계산하는 순서](/assets/img/deep-learning-fundamentals/neuron-computation.png){: style="max-width: 100%; height: auto;"}
 
 **그림 설명.** 각 Input에 Weight를 곱한 뒤 더한다. Bias를 더하고 Activation Function을 통과시키면 Output이 나온다. 화살표를 왼쪽부터 따라가 보자.
 
@@ -125,7 +125,7 @@ a가 음수이면 0을 출력한다. 양수이면 a를 그대로 출력한다.
 
 따라서 ReLU의 Activation은 1보다 클 수 있다. 모든 Activation이 0과 1 사이에 있는 것은 아니다. 범위는 사용하는 Activation Function에 따라 달라진다.
 
-![Layer 사이의 흐름과 Activation Function](/assets/img/deep-learning-fundamentals/layers-and-activation.png)
+![Layer 사이의 흐름과 Activation Function](/assets/img/deep-learning-fundamentals/layers-and-activation.png){: style="max-width: 100%; height: auto;"}
 
 **그림 설명.** 왼쪽 그림은 이해를 위해 Neuron 수를 줄인 구조이다. 정보는 왼쪽에서 오른쪽으로 전달된다. 오른쪽은 Sigmoid와 ReLU가 들어온 값을 바꾸는 방식이다.
 
@@ -218,7 +218,7 @@ Local Minimum은 주변보다 낮은 지점이다. Global Minimum은 전체에�
 
 경사하강법(Gradient Descent)이 항상 Global Minimum을 찾는 것은 아니다. 또한 Gradient가 0인 지점이 반드시 최솟값인 것도 아니다. 학습 과정에서는 Cost와 평가 성능을 함께 확인해야 한다.
 
-![예측 오차와 Cost를 줄이는 과정](/assets/img/deep-learning-fundamentals/loss-and-gradient.png)
+![예측 오차와 Cost를 줄이는 과정](/assets/img/deep-learning-fundamentals/loss-and-gradient.png){: style="max-width: 100%; height: auto;"}
 
 **그림 설명.** 왼쪽은 숫자 0–4의 Output만 표시한 예시이다. 청록색은 Prediction, 주황색은 Target이다. Target이 0인 막대는 높이가 없어 보이지 않는다. 두 막대의 차이가 작아지는 것이 목표이다. 오른쪽은 하나의 Weight만 바꾼 단순한 Cost 그래프이다. 점과 화살표는 Cost가 낮아지는 쪽으로 조금씩 이동하는 과정을 보여 준다.
 
