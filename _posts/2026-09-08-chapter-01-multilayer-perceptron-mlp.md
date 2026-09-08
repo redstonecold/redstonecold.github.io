@@ -1,17 +1,13 @@
 ---
 layout: post
-title: "AI와 딥러닝 공부 기록"
+title: "Chapter 01. Multilayer Perceptron (MLP)"
 date: 2026-09-08 00:00:00
-description: "AI와 딥러닝을 공부하며 배운 내용을 정리한 첫 번째 기록"
+description: "이번 학습에서는 Multilayer Perceptron의 구조와 학습 원리를 이론적·수학적 관점에서 살펴보고, 주요 개념과 동작 과정을 자신의 언어로 설명할 수 있는 수준까지 이해하는 것을 목표로 합니다. 특히 Neural Network가 입력으로부터 출력을 계산하는 과정과, 예측 오차를 이용하여 Weight와 Bias를 업데이트하는 과정을 수식 수준에서 이해하는 것을 목표로 합니다."
+
 tags: [ai, deep-learning, study]
 categories: ["AI/DeepLearning"]
 ---
 
-## Learning Objective
-
-이번 학습에서는 Multilayer Perceptron의 구조와 학습 원리를 이론적·수학적 관점에서 살펴보고, 주요 개념과 동작 과정을 자신의 언어로 설명할 수 있는 수준까지 이해하는 것을 목표로 합니다.
-
-특히 Neural Network가 입력으로부터 출력을 계산하는 과정과, 예측 오차를 이용하여 Weight와 Bias를 업데이트하는 과정을 수식 수준에서 이해하는 것을 목표로 합니다.
 
 ## Topics
 
@@ -110,16 +106,20 @@ Batch, Stochastic, Mini-batch Gradient Descent의 차이와 각각의 장단점�
 
 <!-- 각 주제에 대해 공부한 내용을 여기에 계속 추가합니다. -->
 
-## Code Practice
+## 코드 실습
 
 ```python
 # 실습 코드를 여기에 추가합니다.
 ```
 
-## Questions
+## 헷갈린 점
 
 <!-- 공부하면서 생긴 질문과 추가로 확인할 내용을 기록합니다. -->
 
-## References
+## 다음에 공부할 내용
+
+- 
+
+## 참고 자료
 
 - 
