@@ -118,7 +118,7 @@ Batch, Stochastic, Mini-batch Gradient Descent의 차이와 각각의 장단점�
 
 ## 다음에 공부할 내용
 
-- 
+-
 
 ## 참고 자료
 
