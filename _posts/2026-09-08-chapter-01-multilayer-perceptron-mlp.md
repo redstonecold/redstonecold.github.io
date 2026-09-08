@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "AI와 딥러닝 공부 기록"
-date: 2026-09-08 20:00:00
+date: 2026-09-08 00:00:00
 description: "AI와 딥러닝을 공부하며 배운 내용을 정리한 첫 번째 기록"
 tags: [ai, deep-learning, study]
 categories: ["AI/DeepLearning"]
