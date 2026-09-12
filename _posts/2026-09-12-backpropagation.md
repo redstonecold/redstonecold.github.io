@@ -113,6 +113,12 @@ $$
 
 Cost는 Output이 목표에서 얼마나 벗어났는지 나타낸다. 이 값만으로는 어떤 Weight를 얼마나 바꿀지 알 수 없다. 그 정보를 얻으려면 미분이 필요하다.
 
+### 3.3 Computational Graph
+
+앞의 “Activation → z → Output → Cost” 도식은 Computational Graph이다. 계산 결과를 Node로, 값의 의존 관계를 화살표로 표현한다. Weight와 Bias도 계산에 들어오는 Node이다.
+
+Forward에서는 화살표 방향으로 값을 구한다. Backward에서는 각 연산의 국소 미분을 이용해 Cost의 영향을 거꾸로 전달한다. 한 Node에서 여러 경로로 갈라지면 돌아오는 Gradient를 더한다. 중간 결과를 저장하고 재사용하므로 같은 미분을 반복 계산할 필요가 줄어든다.
+
 ## 4. Chain Rule(연쇄법칙): 작은 변화의 경로를 따라가기
 
 우리가 구하려는 값은 다음과 같다.
@@ -121,7 +127,7 @@ $$
 \frac{\partial C_0}{\partial w^{(L)}}
 $$
 
-이 값은 Weight가 조금 변할 때 Cost가 얼마나 변하는지 나타낸다. 다른 독립적인 Parameter와 Input은 고정한다.
+이 값은 Partial Derivative(편미분)이다. 여러 변수 중 하나를 선택해 변화율을 구한다. Weight가 조금 변할 때 Cost가 얼마나 변하는지 나타낸다. 다른 독립적인 Parameter와 Input은 고정한다.
 
 Weight는 Cost를 곧바로 바꾸지 않는다. 중간 계산을 거친다.
 
@@ -168,6 +174,14 @@ $$
 프라임 기호는 미분을 뜻한다. 이 값은 Sigmoid가 현재 위치에서 얼마나 가파른지 나타낸다.
 
 Sigmoid가 0이나 1 근처에서 평평해지면 이 기울기는 작아진다. 따라서 Output의 오차가 있어도 앞쪽으로 전달되는 Gradient가 작을 수 있다. “오차가 크면 Weight도 항상 크게 바뀐다”는 해석은 맞지 않는다.
+
+### 5.2.1 Vanishing Gradient와 Depth
+
+Sigmoid의 평평한 구간에서 기울기가 작아지는 현상은 앞쪽 Layer의 학습에도 영향을 준다. Backpropagation은 Layer를 거치며 국소 미분과 Weight를 곱한다. 이 곱이 반복해서 작아지면 앞쪽 Parameter에 도달하는 Gradient도 매우 작아진다. 이것이 Vanishing Gradient이다.
+
+작은 Gradient는 작은 업데이트로 이어진다. 그 결과 앞쪽 Layer가 학습되는 속도가 느려질 수 있다. 반대로 반복되는 곱이 너무 커지는 경우는 Exploding Gradient라고 한다. 깊이만으로 어느 현상이 발생하는지 결정되지는 않는다. Weight와 Activation Function의 조합도 중요하다.
+
+ReLU는 양수 구간의 미분이 1이므로 Sigmoid의 포화에 따른 축소를 완화할 수 있다. 하지만 음수 구간에서는 미분이 0이다. ReLU를 사용한다고 모든 Gradient 문제가 사라지는 것은 아니다. 적절한 초기화, Normalization, Residual Connection 등도 깊은 모델의 학습에 사용된다. [Gradient의 소실과 폭주](https://d2l.ai/chapter_multilayer-perceptrons/numerical-stability-and-init.html).
 
 ### 5.3 Weight가 z에 미치는 영향
 
@@ -223,6 +237,16 @@ Bias는 z에 그대로 더해진다. 따라서 Bias에 대한 z의 미분은 1�
 ![미분 대상에 따른 첫 구간의 차이](/assets/img/backpropagation/06-bias-input.svg)
 
 **그림 읽기.** 세 줄 모두 오른쪽 두 항은 같다. 첫 항만 Weight, Bias, 이전 Activation 중 무엇을 미분하는지에 따라 달라진다.
+
+### 6.3 Learning Rate와 Weight and Bias Update
+
+Gradient는 변화의 방향과 민감도를 알려 준다. Learning Rate는 한 번에 움직이는 보폭이다. 기본 Gradient Descent 규칙은 **새 Parameter = 현재 Parameter − Learning Rate × 해당 Gradient**이다. Weight와 Bias에 각각 적용한다.
+
+예를 들어 현재 Weight가 0.5, Gradient가 +0.2, Learning Rate가 0.1이면 새 Weight는 0.48이다. Bias가 0.1이고 Gradient가 −0.3이면 새 Bias는 0.13이다. Gradient의 부호가 다르므로 움직이는 방향도 다르다.
+
+기본 방식에서는 같은 현재 Parameter에서 Gradient를 모두 계산한 뒤 업데이트한다. Backward 도중 Weight를 먼저 바꾸면 뒤의 계산이 다른 Network를 기준으로 수행될 수 있다.
+
+Learning Rate가 너무 크면 좋은 영역을 지나치거나 학습이 불안정해질 수 있다. 너무 작으면 학습이 느리다. Learning Rate는 학습되는 Weight가 아니라 학습 절차를 정하는 Hyperparameter이다.
 
 ## 7. Training example 여러 개의 Gradient
 
@@ -289,6 +313,32 @@ Mini-batch는 데이터를 나눠 업데이트하는 방식이다. Backpropagati
 ![Mini-batch 업데이트 순서](/assets/img/backpropagation/08-minibatch.svg)
 
 **그림 읽기.** 청록색 네 장으로 Gradient를 구하고 평균 낸다. Parameter를 한 번 바꾼 뒤 다음 묶음을 처리한다. 모든 묶음을 처음부터 같은 Parameter로 계산해 두는 방식은 아니다.
+
+### 8.1 Batch, Stochastic, Mini-batch의 장단점
+
+| 방법 | 장점 | 부담과 주의점 |
+| --- | --- | --- |
+| Batch Gradient Descent | 전체 Training Cost의 정확한 Gradient 사용 | 한 번 업데이트하기까지 전체 데이터 계산 필요 |
+| SGD: example 하나 | 빠르게 업데이트 가능, 한 번에 필요한 메모리가 작음 | Gradient의 변동이 크고 GPU 병렬 처리 효율이 낮을 수 있음 |
+| Mini-batch SGD | 병렬 처리와 업데이트 빈도의 절충 | Batch Size 선택에 따라 메모리와 Gradient 변동이 달라짐 |
+
+무작위 추출을 적절히 하면 Mini-batch 평균은 전체 Gradient의 추정값이 된다. Batch Size를 키우면 보통 추정의 변동은 줄지만, 업데이트 하나의 연산량과 메모리가 늘어난다. 같은 Epoch 수에서는 업데이트 횟수도 줄어든다. 큰 Batch가 항상 더 빠르거나 Generalization에 더 좋은 것은 아니다. [Mini-batch SGD의 계산 특성](https://d2l.ai/chapter_optimization/minibatch-sgd.html).
+
+### 8.2 Epoch, Batch Size, Iteration
+
+| 용어 | 이 글에서의 의미 |
+| --- | --- |
+| Batch Size | 한 Mini-batch에 들어 있는 example 수 |
+| Iteration | 한 Mini-batch로 Forward, Backward, 업데이트를 한 번 수행 |
+| Epoch | Training Dataset 전체를 한 번 순회 |
+
+Training example이 1,000개이고 Batch Size가 100이면, 10 Iterations가 1 Epoch이다. 5 Epochs 학습하면 총 50회 업데이트한다. Batch Size를 200으로 늘리면 1 Epoch의 업데이트는 5회가 된다.
+
+1,030개를 Batch Size 100으로 처리하면 마지막 묶음은 30개이다. 마지막 묶음까지 사용하면 11 Iterations이다. 마지막 묶음을 버리는 설정에서는 10회이지만 해당 Epoch에서 30개는 사용하지 않는다. 이 설명은 Gradient Accumulation 없이 Mini-batch마다 업데이트하는 기본 방식이다.
+
+![Epoch와 Mini-batch 업데이트 단위](/assets/img/dl-concepts/epoch.svg)
+
+**그림 읽기.** 한 줄 전체가 1 Epoch이다. 작은 묶음마다 Gradient를 구하고 Parameter를 한 번 바꾼다. 다음 Epoch에서는 다시 데이터 전체를 순회한다.
 
 ## 9. 한 Layer에 Neuron이 여러 개라면?
 
@@ -359,6 +409,8 @@ $$
 
 학습의 흐름은 다음과 같다.
 
-**Forward 계산 → Cost 계산 → Backpropagation → Gradient를 이용한 업데이트**
+**Forward Propagation → Loss Calculation → Backpropagation으로 Gradient Calculation → Parameter Update**
+
+Gradient Calculation과 Backpropagation을 별도의 연속 단계로 생각하지 않는다. Backpropagation이 Gradient를 계산하는 알고리즘이다. Classification에서 Sigmoid·Softmax·Cross-Entropy를 선택하는 이유와 MLP의 표현력은 [Neuron에서 경사하강법까지](/blog/2026/deep-learning-fundamentals/)에서 확인할 수 있다.
 
 Backpropagation의 결과는 “어떤 Parameter를 어느 방향으로 움직이면 좋은가”에 대한 국소적인 정보이다. 최종 정답 Weight를 한 번에 찾아 주는 과정은 아니다. 이 계산과 업데이트를 반복하며 모델을 학습한다.

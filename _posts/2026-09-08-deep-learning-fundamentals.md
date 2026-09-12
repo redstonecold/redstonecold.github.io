@@ -16,7 +16,7 @@ Neural Network는 Input을 받아 Output을 계산한다. 학습은 예측이 �
 
 ## 1. Neuron과 Activation
 
-Neuron은 숫자 하나를 담는 계산 단위로 이해할 수 있다. 이 숫자가 Activation이다. Activation은 해당 Neuron의 반응 정도를 나타낸다.
+여기서 Neuron은 Artificial Neuron을 뜻한다. 생물학적 Neuron의 작동을 그대로 재현한 것은 아니다. Input에 Weight를 곱하고 Bias와 Activation Function을 적용하는 계산 단위이다. Neuron의 출력은 숫자 하나로 표현한다. 이 숫자가 Activation이다. Activation은 해당 Neuron의 반응 정도를 나타낸다.
 
 여기서 다룰 예시는 손글씨 숫자 분류이다. Input 이미지는 28 × 28 Pixel로 구성된다. 따라서 Input에는 784개의 Neuron을 둔다. 각 Neuron은 Pixel 하나의 값을 전달한다.
 
@@ -52,6 +52,10 @@ Weight(가중치)는 각 Activation이 계산에 기여하는 정도를 조절�
 
 **그림 설명.** 각 Input에 Weight를 곱한 뒤 더한다. Bias를 더하고 Activation Function을 통과시키면 Output이 나온다. 화살표를 왼쪽부터 따라가 보자.
 
+### 3.1 Linear Combination
+
+각 Input에 계수를 곱해 더한 것이 Linear Combination이다. 앞의 Weighted Sum이 여기에 해당한다. Bias까지 더한 계산은 엄밀하게는 Affine Transformation이다. Bias를 포함해 편의상 “선형 Layer”라고 부르기도 한다.
+
 ## 4. Sigmoid와 Bias
 
 ### 4.1 Sigmoid
@@ -79,6 +83,51 @@ $$
 Bias는 Neuron이 반응하는 기준을 옮긴다. Sigmoid는 부드럽게 변하므로 특정 기준에서 갑자기 켜지는 스위치는 아니다.
 
 Bias는 더하는 값으로 정의할 수 있다. 아래 행렬식에서는 Bias를 더한다. 이 표기에서 위 예시의 Bias는 −10이다.
+
+### 4.3 Perceptron Model과 Threshold Function
+
+Perceptron은 Weighted Sum과 Bias로 두 Class를 구분하는 모델이다. Sigmoid 대신 Threshold Function을 사용하면 판단이 0 또는 1로 바로 결정된다.
+
+**Weighted Sum + Bias가 0 이상 → 1 / 0 미만 → 0**
+
+Threshold Function은 경계에서 불연속적이다. Sigmoid처럼 부드럽게 변하지 않는다. 따라서 이 함수를 그대로 사용해 일반적인 Backpropagation으로 학습하는 것은 적절하지 않다. 고전적인 Perceptron은 별도의 Perceptron Learning Rule을 사용한다.
+
+### 4.4 Decision Boundary와 Perceptron Learning Rule
+
+Decision Boundary는 예측 Class가 바뀌는 경계이다. Input이 두 개라면 단일 Perceptron의 경계는 직선이다. Input이 세 개라면 평면이다.
+
+학습할 때 정답 y와 예측값 ŷ를 비교한다. 둘 다 0 또는 1로 표현하자.
+
+| 결과 | y − ŷ | 업데이트 |
+| --- | --- | --- |
+| 정답과 예측이 같음 | 0 | 변경하지 않음 |
+| 정답 1, 예측 0 | +1 | Input 방향으로 Weight를 더하고 Bias를 높임 |
+| 정답 0, 예측 1 | −1 | Input 방향으로 Weight를 빼고 Bias를 낮춤 |
+
+정확한 규칙은 간단하다. 각 Weight에는 **Learning Rate × (y − ŷ) × 해당 Input**을 더한다. Bias에는 **Learning Rate × (y − ŷ)**를 더한다. Input이 음수라면 Weight 변화의 부호도 달라진다.
+
+예를 들어 Input이 (1, 0), 정답이 1, 예측이 0이고 Learning Rate가 0.1이라고 하자. 첫 Weight와 Bias에는 0.1을 더한다. 두 번째 Weight는 그대로 둔다. 이 Input을 다시 만났을 때 1로 판단하기 쉬워진다.
+
+이것이 Perceptron Learning Rule이다. 선형 분리가 가능한 유한한 데이터에서는 표준 규칙이 유한 횟수의 오류 수정 후 분리 경계를 찾는다. 선형 분리가 불가능하면 수렴이 보장되지 않는다.
+
+### 4.5 Single-Layer Perceptron의 한계: XOR Problem
+
+XOR은 두 Input이 다를 때만 1을 출력한다.
+
+| Input 1 | Input 2 | XOR |
+| --- | --- | --- |
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+네 점을 정사각형 꼭짓점에 놓아 보자. 같은 Class가 대각선으로 마주 본다. 직선 하나로 두 Class를 나눌 수 없다. 따라서 단일 Perceptron은 XOR을 표현할 수 없다.
+
+![단일 직선으로 분리할 수 없는 XOR](/assets/img/dl-concepts/xor.svg)
+
+**그림 읽기.** 청록색 두 점은 1, 주황색 두 점은 0이다. 한쪽 색을 직선의 한 편에 모두 모으려 하면 다른 색이 함께 들어온다.
+
+이 문제는 학습 시간을 늘리는 것만으로 해결되지 않는다. 모델이 만들 수 있는 Decision Boundary 자체에 한계가 있기 때문이다. Hidden Layer가 필요한 이유를 여기서 볼 수 있다.
 
 ## 5. Layer 전체의 계산
 
@@ -112,6 +161,40 @@ $$
 Sigmoid는 vector 전체를 숫자 하나로 바꾸지 않는다. x, y, z에 각각 적용된다.
 
 이 계산을 Input에서 Output까지 반복한다. 이 과정이 Forward Propagation이다.
+
+### 5.1 Multilayer Perceptron (MLP)
+
+MLP는 Input Layer, 하나 이상의 Hidden Layer, Output Layer로 구성된 Feedforward Network이다. 보통 인접 Layer 사이를 완전연결한다. 각 Hidden Neuron은 Weight, Bias, 비선형 Activation Function으로 계산한다.
+
+| Layer | 역할 |
+| --- | --- |
+| Input Layer | Pixel이나 측정값 같은 Input Data를 전달 |
+| Hidden Layer | 학습한 변환으로 새로운 특징을 계산 |
+| Output Layer | 예측값을 문제에 맞는 형태로 출력 |
+
+이 글의 손글씨 Network가 MLP의 한 예이다. MLP라는 이름을 쓰더라도 Hidden Layer가 고전적인 Threshold Function을 사용해야 하는 것은 아니다. Sigmoid나 ReLU처럼 Gradient 기반 학습에 사용할 수 있는 함수를 쓴다.
+
+### 5.2 Non-linearity와 Non-linear Representation
+
+비선형 Activation Function을 제거하고 Affine Layer만 여러 개 쌓아 보자. 결과는 다시 하나의 Affine Transformation으로 합쳐진다. 깊어졌다는 이유만으로 XOR을 구분할 수는 없다.
+
+Hidden Layer의 비선형 변환은 이 제한을 벗어나게 한다. XOR에서는 “적어도 하나가 1인가?”와 “둘 다 1인가?” 같은 중간 특징을 만든 뒤 조합하면 된다. 첫 조건이 참이고 두 번째 조건이 거짓일 때 XOR은 1이다.
+
+이처럼 원래 Input을 구분하기 쉬운 새 특징으로 바꾸는 것이 Non-linear Representation의 역할이다. 실제 학습에서는 사람이 이런 규칙을 직접 정하기보다 데이터로 Weight를 조정한다.
+
+### 5.3 Representation Learning
+
+모델이 문제에 필요한 특징 자체를 학습하는 것을 Representation Learning이라고 한다. 손글씨 분류에서는 Pixel을 그대로 비교하는 대신 Hidden Layer에서 유용한 조합을 만들 수 있다.
+
+특징 하나가 Neuron 하나에 명확히 대응할 필요는 없다. 여러 Neuron의 Activation이 함께 하나의 특징을 표현할 수 있다. 따라서 모든 Hidden Neuron에 “가로획 감지기”처럼 이름을 붙일 수 있는 것은 아니다.
+
+### 5.4 Universal Approximation과 Network Depth
+
+Universal Approximation은 MLP의 표현 가능성에 대한 결과이다. 대표적으로, Sigmoid Hidden Layer의 폭을 충분히 늘리고 선형 Output을 사용하면 유계의 닫힌 입력 영역에서 연속 함수를 원하는 정확도로 근사할 수 있다.
+
+이 결과는 작은 Network가 모든 함수를 정확히 표현한다는 뜻이 아니다. 학습 알고리즘이 좋은 Weight를 찾는다는 보장도 아니다. 필요한 Neuron 수, 학습 데이터, Generalization은 별개의 문제이다.
+
+Depth가 늘면 여러 단계의 특징을 조합할 수 있다. 어떤 함수는 얕고 매우 넓은 Network보다 깊은 Network에서 효율적으로 표현된다. 반면 계산 비용과 최적화의 어려움도 커진다. “깊을수록 항상 성능이 좋다”는 결론은 성립하지 않는다. [관련 설명: Deep Learning, Deep Feedforward Networks](https://www.deeplearningbook.org/contents/mlp.html).
 
 ## 6. ReLU
 
@@ -148,6 +231,47 @@ $$
 
 전체 Cost를 계산할 때는 생략된 항을 포함해 10개 Output의 제곱오차를 모두 더한다.
 
+### 7.1 Classification에 맞는 Output과 Loss
+
+제곱오차는 학습 원리를 설명하기에 간단하다. 실제 분류에서는 Output의 의미에 맞춰 Loss Function을 선택한다.
+
+| 문제 | Output 구성 | 대표 Loss |
+| --- | --- | --- |
+| Binary Classification | Sigmoid 하나로 Class 1의 확률을 모델링 | Binary Cross-Entropy |
+| Multi-class Classification | Class별 Logit을 Softmax로 변환 | Categorical Cross-Entropy |
+
+Logit은 확률로 변환하기 전의 점수이다. 여기서는 마지막 Layer의 Weighted Sum과 Bias를 더한 값이다.
+
+### 7.2 Binary Classification: Sigmoid
+
+예를 들어 “고양이인가?”처럼 두 Class를 구분한다. Sigmoid Output이 0.8이면 모델이 Class 1에 부여한 확률은 0.8이다. Class 0에는 0.2가 대응한다. 실제 발생 빈도와 완벽히 일치하는 확률이라는 보장은 없다.
+
+확률을 최종 Class로 바꾸려면 Threshold가 필요하다. 기본 예시로 0.5 이상이면 1로 분류할 수 있다. 놓치는 오류와 잘못 경고하는 오류의 비용에 따라 Threshold는 달라질 수 있다.
+
+여기서 분류용 Threshold는 예측을 해석하는 단계이다. 학습 중에는 부드러운 Sigmoid Output으로 Loss와 Gradient를 계산한다.
+
+### 7.3 Multi-class Classification: Softmax
+
+숫자 0–9 중 하나를 고르는 문제에는 서로 배타적인 Class가 10개 있다. Softmax는 10개의 Logit을 비교해, 모든 성분이 양수이고 합이 1인 확률 분포로 바꾼다.
+
+계산은 **각 Logit에 지수함수 적용 → 그 결과의 전체 합으로 나누기**이다. 예를 들어 Logit이 (0, 0, 0)이면 세 확률은 모두 1/3이다. (2, 1, 0)이면 약 (0.665, 0.245, 0.090)이 된다.
+
+Sigmoid를 각 성분에 따로 적용하면 합이 1이라는 보장이 없다. Softmax는 Class 사이의 상대적인 점수를 함께 반영한다. 최종 예측은 보통 가장 큰 확률의 Class이다.
+
+### 7.4 Cross-Entropy Loss
+
+One-hot 정답을 사용하는 Multi-class Classification에서는 정답 Class에 부여한 확률 p만 보면 된다. 개별 example의 Cross-Entropy Loss는 **−log(p)**이다.
+
+정답에 0.9를 부여하면 Loss는 약 0.105이다. 0.1만 부여하면 약 2.303이다. 자연로그 기준이다. 정답을 확신할수록 Loss가 작고, 틀린 Class를 강하게 확신할수록 Loss가 커진다.
+
+Binary Cross-Entropy도 같은 원리이다. 정답이 1이면 Sigmoid의 p를, 정답이 0이면 1−p를 정답 확률로 사용한다. [Softmax와 Cross-Entropy 설명](https://d2l.ai/chapter_linear-classification/softmax-regression.html).
+
+### 7.5 Training과 Inference
+
+Training에서는 정답이 있는 데이터로 Forward Propagation, Loss 계산, Backpropagation, Parameter Update를 수행한다.
+
+Inference에서는 학습한 Parameter로 새로운 Input의 Output을 계산한다. 정답을 입력하지 않아도 예측할 수 있다. 일반적인 Inference에서는 Gradient 계산과 Parameter Update를 하지 않는다. Input 정규화 등 전처리는 학습 때의 기준을 유지한다.
+
 ## 8. Neural Network와 Cost Function
 
 같은 Network를 두 관점에서 살펴보자.
@@ -162,6 +286,22 @@ Neural Network는 현재 Weight(가중치)와 Bias로 예측을 계산한다. Co
 13,002개는 이 예시 Network의 Parameter 수이다. 모든 Neural Network가 같은 수의 Parameter를 갖는 것은 아니다.
 
 Training Dataset은 Parameter를 조정하는 데 사용한다. Test Dataset은 학습에 사용하지 않은 데이터에서 성능을 확인하는 데 사용한다.
+
+### 8.1 Model Capacity, Overfitting, Generalization
+
+Model Capacity는 모델이 얼마나 다양한 관계를 표현할 수 있는지를 뜻한다. Layer의 폭과 깊이, Activation Function 등이 영향을 준다. Parameter 수는 참고 지표이지만 Capacity를 완전히 설명하지는 않는다.
+
+Capacity가 부족하면 Training Data의 규칙도 충분히 표현하지 못할 수 있다. 반대로 모델이 Training Data의 잡음이나 우연한 패턴까지 따라가면 Overfitting이 생길 수 있다.
+
+Generalization은 학습하지 않은 데이터에서도 유용한 예측을 하는 능력이다. Training Loss가 줄어드는 동안 Validation Loss가 지속적으로 커진다면 Overfitting을 의심할 수 있다. 다만 데이터 분포 차이도 확인해야 한다.
+
+| 데이터 구분 | 용도 |
+| --- | --- |
+| Training | Weight와 Bias 학습 |
+| Validation | 모델 크기, Learning Rate, 학습 종료 시점 선택 |
+| Test | 선택을 마친 모델의 최종 성능 평가 |
+
+Test 결과를 반복해서 보고 설정을 고르면 Test도 간접적으로 학습에 사용한 셈이 된다. 더 많은 적절한 데이터, Regularization, Early Stopping은 Overfitting을 줄이는 데 도움이 될 수 있다. Early Stopping은 보통 Validation 성능을 기준으로 학습을 멈춘다.
 
 ## 9. Gradient와 경사하강법(Gradient Descent)
 
@@ -228,4 +368,4 @@ Neuron은 Weighted Sum과 Bias를 계산한다. Activation Function은 그 결�
 
 Cost(Loss)는 Output과 정답의 차이를 나타낸다. Gradient는 Parameter를 어느 방향으로 조정할지 알려 준다. 경사하강법(Gradient Descent)은 이 정보를 이용해 Cost를 줄여 나간다.
 
-다음 학습 주제는 역전파이다. 여러 Layer에 걸친 Gradient를 어떻게 계산하는지 살펴볼 예정이다.
+여러 Layer의 Gradient 계산, Vanishing Gradient, Mini-batch 학습 단위는 [Backpropagation과 Chain Rule](/blog/2026/backpropagation/)에서 이어서 다룬다.
