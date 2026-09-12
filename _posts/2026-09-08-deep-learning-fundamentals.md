@@ -8,6 +8,11 @@ categories: ["AI/DeepLearning"]
 math: true
 ---
 
+<style>
+article h2 { margin-top: 3.5rem; }
+article h3 { margin-top: 2.5rem; }
+</style>
+
 ## 초록
 
 Neural Network는 Input을 받아 Output을 계산한다. 학습은 예측이 정답에 가까워지도록 Weight(가중치)와 Bias를 조정하는 과정이다.

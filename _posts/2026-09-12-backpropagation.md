@@ -8,6 +8,12 @@ categories: ["AI/DeepLearning"]
 math: true
 ---
 
+<style>
+article h2 { margin-top: 3.5rem; }
+article h3 { margin-top: 2.5rem; }
+article img { max-width: 100%; height: auto; }
+</style>
+
 ## 초록
 
 Neural Network의 학습에는 두 과정이 필요하다. 먼저 각 Weight와 Bias가 Cost에 미치는 영향을 계산한다. 다음으로 Cost가 줄어드는 방향으로 값을 조정한다.
@@ -16,7 +22,7 @@ Backpropagation(역전파)은 첫 번째 과정을 담당한다. Output에서 �
 
 이 글에서는 먼저 직관을 살펴본다. 이어서 한 Neuron의 미분을 직접 전개한다. 마지막으로 여러 Neuron과 Mini-batch로 설명을 확장한다.
 
-![Forward와 Backward의 방향](/assets/img/backpropagation/01-forward-backward.png)
+![Forward와 Backward의 방향](/assets/img/backpropagation/01-forward-backward.png){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 위쪽에서는 Activation과 Cost를 계산한다. 아래쪽에서는 Cost에서 출발해 Gradient를 계산한다. Input 자체는 학습 Parameter로 업데이트하지 않는다.
 
@@ -36,7 +42,7 @@ Sigmoid를 사용하는 Neuron에서는 세 가지 영향을 생각할 수 있�
 
 이것이 Backpropagation의 출발점이다.
 
-![연결 부호에 따른 Activation 변화](/assets/img/backpropagation/02-signs.svg)
+![연결 부호에 따른 Activation 변화](/assets/img/backpropagation/02-signs.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** Output을 높이고 싶어도 앞쪽 Activation을 항상 높이는 것은 아니다. 양의 연결에서는 높이고, 음의 연결에서는 낮추는 방향이 유리하다.
 
@@ -56,7 +62,7 @@ Backpropagation은 이 영향을 부호와 크기를 포함해 더한다. 단순
 
 이렇게 구한 정보를 한 Layer 앞쪽으로 전달한다. 앞쪽 Layer에서도 같은 계산을 반복한다. 계산 방향은 Output에서 Input 쪽이지만, Forward Propagation에서 구한 값들이 필요하다.
 
-![여러 Output 기여의 합](/assets/img/backpropagation/10-contributions.svg)
+![여러 Output 기여의 합](/assets/img/backpropagation/10-contributions.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 한 Hidden Activation에 대한 두 경로의 기여가 +0.6과 −0.2라면 합은 +0.4이다. 이 숫자는 합산 원리를 위한 예시이다. 실제 Activation 변화는 앞쪽 Parameter의 업데이트로 간접적으로 일어난다.
 
@@ -77,7 +83,7 @@ Backpropagation은 이 영향을 부호와 크기를 포함해 더한다. 단순
 
 괄호가 있는 위첨자 (L)은 거듭제곱이 아니다. 어느 Layer의 값인지 나타낸다. C₀의 아래첨자 0도 Layer 번호가 아니다. 여기서는 첫 번째 Training example을 구분한다.
 
-![한 Neuron의 Forward 계산](/assets/img/backpropagation/03-forward-path.svg)
+![한 Neuron의 Forward 계산](/assets/img/backpropagation/03-forward-path.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** a⁽ᴸ⁻¹⁾에서 출발해 z, a⁽ᴸ⁾, C₀ 순서로 읽는다. 목표값 y는 Cost를 계산할 때 비교 대상으로 들어간다. 이 그림의 수치를 아래 수식과 대응해 보자.
 
@@ -145,7 +151,7 @@ $$
 
 왼쪽은 최종적으로 알고 싶은 변화율이다. 오른쪽은 이를 세 구간으로 나눈 것이다. 분수를 단순히 약분하는 규칙이 아니라, 합성된 함수의 미분 규칙이다.
 
-![Chain Rule의 세 구간](/assets/img/backpropagation/04-chain-rule.svg)
+![Chain Rule의 세 구간](/assets/img/backpropagation/04-chain-rule.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 화살표 하나마다 변화율이 하나씩 있다. 세 변화율을 곱하면 Weight가 Cost에 미치는 영향을 얻는다.
 
@@ -214,7 +220,7 @@ $$
 
 Gradient가 양수이면 Gradient Descent는 해당 Weight를 줄이는 방향으로 움직인다. 음수이면 늘리는 방향으로 움직인다. 실제 변화량에는 Learning Rate도 반영된다.
 
-![Gradient의 세 요소](/assets/img/backpropagation/05-three-factors.svg)
+![Gradient의 세 요소](/assets/img/backpropagation/05-three-factors.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 앞의 미분 결과를 세 카드에 대응해 보자. Input이 커도 Sigmoid의 기울기가 작으면 Gradient가 작아질 수 있다.
 
@@ -234,7 +240,7 @@ Bias는 z에 그대로 더해진다. 따라서 Bias에 대한 z의 미분은 1�
 
 이전 Activation의 Gradient를 구했다면, 그 Activation을 만든 앞쪽 Weight와 Bias로 계산을 이어 갈 수 있다. Backpropagation은 이렇게 이미 구한 결과를 재사용한다.
 
-![미분 대상에 따른 첫 구간의 차이](/assets/img/backpropagation/06-bias-input.svg)
+![미분 대상에 따른 첫 구간의 차이](/assets/img/backpropagation/06-bias-input.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 세 줄 모두 오른쪽 두 항은 같다. 첫 항만 Weight, Bias, 이전 Activation 중 무엇을 미분하는지에 따라 달라진다.
 
@@ -281,7 +287,7 @@ $$
 
 Backpropagation은 이 Gradient를 계산한다. Gradient Descent는 음의 Gradient 방향으로 Parameter를 업데이트한다. 두 알고리즘이 각각 다른 “최종 Weight”를 구하는 것은 아니다.
 
-![여러 example의 Gradient 평균](/assets/img/backpropagation/07-mean.svg)
+![여러 example의 Gradient 평균](/assets/img/backpropagation/07-mean.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 같은 Parameter에서 구한 Gradient가 +0.6, −0.2, −0.1이면 평균은 +0.1이다. 양의 Gradient이므로 해당 Weight는 줄이는 방향으로 업데이트한다.
 
@@ -310,7 +316,7 @@ Mini-batch Gradient는 전체 Gradient의 추정값이다. 따라서 매번 정�
 
 Mini-batch는 데이터를 나눠 업데이트하는 방식이다. Backpropagation은 Gradient를 계산하는 방식이다. 두 개념을 구분하면 학습 흐름이 명확해진다.
 
-![Mini-batch 업데이트 순서](/assets/img/backpropagation/08-minibatch.svg)
+![Mini-batch 업데이트 순서](/assets/img/backpropagation/08-minibatch.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 청록색 네 장으로 Gradient를 구하고 평균 낸다. Parameter를 한 번 바꾼 뒤 다음 묶음을 처리한다. 모든 묶음을 처음부터 같은 Parameter로 계산해 두는 방식은 아니다.
 
@@ -336,7 +342,7 @@ Training example이 1,000개이고 Batch Size가 100이면, 10 Iterations가 1 E
 
 1,030개를 Batch Size 100으로 처리하면 마지막 묶음은 30개이다. 마지막 묶음까지 사용하면 11 Iterations이다. 마지막 묶음을 버리는 설정에서는 10회이지만 해당 Epoch에서 30개는 사용하지 않는다. 이 설명은 Gradient Accumulation 없이 Mini-batch마다 업데이트하는 기본 방식이다.
 
-![Epoch와 Mini-batch 업데이트 단위](/assets/img/dl-concepts/epoch.svg)
+![Epoch와 Mini-batch 업데이트 단위](/assets/img/dl-concepts/epoch.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 한 줄 전체가 1 Epoch이다. 작은 묶음마다 Gradient를 구하고 Parameter를 한 번 바꾼다. 다음 Epoch에서는 다시 데이터 전체를 순회한다.
 
@@ -372,7 +378,7 @@ $$
 
 연결 번호가 추가되었지만 원리는 같다. Weight가 z를 바꾸고, z가 Activation을 바꾸고, Activation이 Cost를 바꾼다.
 
-![한 Hidden Activation의 여러 경로](/assets/img/backpropagation/09-branches.svg)
+![한 Hidden Activation의 여러 경로](/assets/img/backpropagation/09-branches.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** Hidden Activation에서 Cost까지 두 경로가 있다. 각 경로의 미분을 곱한 뒤 두 기여를 더한다. 아래 합 기호가 바로 이 과정을 나타낸다.
 
@@ -395,7 +401,7 @@ $$
 
 서로 반대 부호를 가진 경로는 일부 상쇄될 수 있다. 같은 방향의 경로는 더해진다. 이렇게 모인 결과가 이전 Layer로 전달된다.
 
-![Forward, Backpropagation, Gradient Descent의 역할](/assets/img/backpropagation/11-summary.svg)
+![Forward, Backpropagation, Gradient Descent의 역할](/assets/img/backpropagation/11-summary.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 왼쪽은 값을 계산하고, 가운데는 변화율을 계산한다. 실제로 Weight와 Bias를 바꾸는 단계는 오른쪽이다.
 
