@@ -14,11 +14,15 @@ article h3 { margin-top: 2.5rem; }
 article img { max-width: 100%; height: auto; }
 </style>
 
+> Input Data → Forward Propagation(순전파) → Prediction → Loss 계산 → Backpropagation(역전파) → Weight와 Bias Update → 반복 Training → 새로운 Input에 대한 Inference(추론)
+
 ## 초록
 
 Neural Network의 학습에는 두 과정이 필요하다. 먼저 각 Weight와 Bias가 Cost에 미치는 영향을 계산한다. 다음으로 Cost가 줄어드는 방향으로 값을 조정한다.
 
 Backpropagation(역전파)은 첫 번째 과정을 담당한다. Output에서 시작해 앞쪽 Layer로 이동하며 Gradient를 계산한다. Gradient Descent(경사하강법)는 이 Gradient를 사용해 Weight와 Bias를 업데이트한다.
+
+Backpropagation을 한 문장으로 정리하면, Output Layer에서 시작해 Layer를 거꾸로 이동하며 각 Layer의 중간 미분(Error) 정보를 계산하고 재사용해 모든 Weight와 Bias의 Gradient를 구하는 알고리즘이다. 각 Weight의 Gradient를 처음부터 독립적으로 구하면 같은 미분을 여러 번 반복 계산해야 하지만, 뒤쪽 Layer에서 구한 중간 결과를 앞쪽 Layer가 그대로 재사용하기 때문에 한 번의 Forward와 한 번의 Backward만으로 전체 Gradient를 구할 수 있다.
 
 이 글에서는 먼저 직관을 살펴본다. 이어서 한 Neuron의 미분을 직접 전개한다. 마지막으로 여러 Neuron과 Mini-batch로 설명을 확장한다.
 
@@ -40,6 +44,8 @@ Sigmoid를 사용하는 Neuron에서는 세 가지 영향을 생각할 수 있�
 
 다만 Hidden Layer의 Activation은 직접 저장해 업데이트하는 Parameter가 아니다. 앞쪽 Layer의 Weight와 Bias가 바뀌면서 결과적으로 달라진다. 따라서 “이 Activation이 어떻게 바뀌면 좋을까?”라는 정보를 앞쪽으로 전달해야 한다.
 
+Backpropagation 과정에서는 이 Hidden Activation이 커지면(혹은 작아지면) Cost가 줄어들겠다는 정보가 Output 쪽에서부터 Chain Rule로 먼저 계산된다. 문제는 그 Activation을 직접 바꿀 방법이 없다는 것이다. Activation을 바꾸려면 결국 그것을 만들어낸 앞쪽 Layer의 Weight와 Bias를 바꾸는 수밖에 없다.
+
 이것이 Backpropagation의 출발점이다.
 
 ![연결 부호에 따른 Activation 변화](/assets/img/backpropagation/02-signs.svg){: style="max-width: 100%; height: auto;"}
@@ -48,7 +54,7 @@ Sigmoid를 사용하는 Neuron에서는 세 가지 영향을 생각할 수 있�
 
 ### 큰 Activation과 연결된 Weight의 영향
 
-이전 Activation이 클수록 같은 Weight 변화가 Weighted Sum에 더 큰 변화를 만든다. 따라서 그 연결의 Gradient에도 이전 Activation이 곱해진다.
+이전 Activation이 클수록 같은 Weight 변화가 Weighted Sum에 더 큰 변화를 만든다. 즉 이 Weight를 바꿨을 때 최종 결과가 얼마나 민감하게 반응하는지를 계산할 때, 이전 Activation의 크기가 그대로 곱셈으로 반영된다.
 
 하지만 이전 Activation만으로 전체 영향이 결정되지는 않는다. Activation Function의 기울기와 현재 예측 오차도 함께 작용한다. 이 세 요소는 뒤에서 하나의 식으로 연결된다.
 
@@ -155,6 +161,28 @@ $$
 
 **그림 읽기.** 화살표 하나마다 변화율이 하나씩 있다. 세 변화율을 곱하면 Weight가 Cost에 미치는 영향을 얻는다.
 
+### 4.1 트리로 표현하기
+
+같은 관계를 Tree 구조로 그리면 다음과 같다.
+
+```
+                    C0
+                    |
+      dC0/da(L) = 2(a(L) - y)
+                    |
+                   a(L)
+                    |
+      da(L)/dz(L) = sigma'(z(L))
+                    |
+                   z(L)
+                    |
+              dz(L)/dw(L) = a(L-1)
+                    |
+                  w(L)
+```
+
+∂C₀/∂w⁽ᴸ⁾을 구하려면 C₀에서 w⁽ᴸ⁾까지 내려가는 경로를 따라가며, 그 경로에 있는 변화율을 전부 곱한다. Node가 여러 갈래로 나뉘는 경우(하나의 Activation이 여러 Neuron과 연결된 경우)에는 각 경로의 곱을 구한 뒤 더한다. “한 경로의 변화율은 곱하고, 여러 경로의 영향은 더한다”는 10절의 기준이 이 Tree 구조에서 그대로 나온다.
+
 ## 5. 세 구간을 직접 미분하기
 
 ### 5.1 Activation이 Cost에 미치는 영향
@@ -167,6 +195,11 @@ $$
 $$
 
 Output이 목표보다 작으면 이 값은 음수이다. Output을 조금 높이는 방향이 해당 Cost를 줄인다. Output이 목표보다 크면 반대이다.
+
+미분값의 부호는 다음을 뜻한다.
+
+- 미분값이 음수라면 → a를 늘리면 Cost는 줄어든다는 뜻이다.
+- 미분값이 양수라면 → a를 늘리면 Cost도 늘어난다는 뜻이다.
 
 ### 5.2 z가 Activation에 미치는 영향
 
@@ -184,6 +217,8 @@ Sigmoid가 0이나 1 근처에서 평평해지면 이 기울기는 작아진다.
 ### 5.2.1 Vanishing Gradient와 Depth
 
 Sigmoid의 평평한 구간에서 기울기가 작아지는 현상은 앞쪽 Layer의 학습에도 영향을 준다. Backpropagation은 Layer를 거치며 국소 미분과 Weight를 곱한다. 이 곱이 반복해서 작아지면 앞쪽 Parameter에 도달하는 Gradient도 매우 작아진다. 이것이 Vanishing Gradient이다.
+
+예를 들어 각 Layer의 국소 미분(σ')이 대략 0.1이라면, Layer를 하나씩 지날 때마다 이 값이 반복해서 곱해진다. 2개 Layer를 지나면 0.1×0.1=0.01, 5개 Layer를 지나면 0.1⁵=0.00001이 된다. Layer가 깊어질수록 이 곱은 지수적으로 작아지고, 맨 앞쪽 Parameter에 도달하는 Gradient는 사실상 0에 가까워진다.
 
 작은 Gradient는 작은 업데이트로 이어진다. 그 결과 앞쪽 Layer가 학습되는 속도가 느려질 수 있다. 반대로 반복되는 곱이 너무 커지는 경우는 Exploding Gradient라고 한다. 깊이만으로 어느 현상이 발생하는지 결정되지는 않는다. Weight와 Activation Function의 조합도 중요하다.
 
