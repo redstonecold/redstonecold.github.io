@@ -21,13 +21,13 @@ Neural Network는 Input을 받아 Output을 계산한다. 학습은 예측이 �
 
 ## 1. Neuron과 Activation
 
-여기서 Neuron은 Artificial Neuron을 뜻한다. 생물학적 Neuron의 작동을 그대로 재현한 것은 아니다. Input에 Weight를 곱하고 Bias와 Activation Function을 적용하는 계산 단위이다. Neuron의 출력은 숫자 하나로 표현한다. 이 숫자가 Activation이다. Activation은 해당 Neuron의 반응 정도를 나타낸다.
+여기서 Neuron은 Artificial Neuron(인공 뉴런)을 뜻한다. 생물학적 Neuron의 작동을 그대로 재현한 것은 아니다. Input에 Weight를 곱하고 Bias와 Activation Function을 적용하는 계산 단위이다. Neuron의 출력은 숫자 하나로 표현한다. 이 숫자가 Activation(활성값)이다. Activation은 해당 Neuron의 반응 정도를 나타낸다.
 
-여기서 다룰 예시는 손글씨 숫자 분류이다. Input 이미지는 28 × 28 Pixel로 구성된다. 따라서 Input에는 784개의 Neuron을 둔다. 각 Neuron은 Pixel 하나의 값을 전달한다.
+여기서 다룰 예시는 손글씨 숫자 분류이다. Input 이미지는 28 × 28 Pixel로 구성된다. 따라서 Input에는 784개의 Neuron을 둔다. 각 Neuron은 Pixel 하나의 값을 전달한다. Pixel 값을 0부터 1 사이로 정규화했다면 0.8은 정해진 기준에서 해당 Pixel의 검은 정도가 0.8이라는 뜻이다. Input Layer에서는 이 Pixel 값을 Input Activation이라고도 부른다.
 
-Output에는 10개의 Neuron을 둔다. 각각 숫자 0부터 9에 대응한다. Output이 큰 숫자를 모델의 예측으로 선택한다.
+Output에는 10개의 Neuron을 둔다. 각각 숫자 0부터 9에 대응한다. 가장 큰 Activation을 가진 Output Neuron에 해당하는 숫자를 모델의 예측으로 선택한다.
 
-단, Activation이 0과 1 사이에 있다는 것만으로 확률이 되는 것은 아니다. 이 글에서는 우선 각 숫자에 대한 모델의 반응값으로 이해한다.
+같은 0.8이라도 Layer에 따라 의미가 다르다. Input Activation 0.8은 Pixel의 검은 정도를 나타낸다. Hidden Activation 0.8은 여러 Pixel을 종합한 뒤 해당 Neuron이 보인 반응의 크기이다. Hidden Activation이 0과 1 사이라는 이유만으로 “어떤 Pattern이 존재할 확률이 80%”라는 뜻은 아니다. Output은 문제와 학습 방법에 따라 특정 Class의 예측 확률로 해석할 수 있다.
 
 ![Pixel에서 숫자 예측까지](/assets/img/deep-learning-fundamentals/pixels-to-prediction.png){: style="max-width: 100%; height: auto;"}
 
@@ -35,7 +35,7 @@ Output에는 10개의 Neuron을 둔다. 각각 숫자 0부터 9에 대응한다.
 
 ## 2. Hidden Layer와 패턴
 
-Input과 Output 사이에는 Hidden Layer가 있다. 이 예시에는 Hidden Layer가 두 개 있다.
+Input과 Output 사이에는 Hidden Layer가 있다. 이 예시에는 설명을 쉽게 하기 위해 Hidden Layer를 두 개 사용한다. 간단한 MLP 실험에서는 한두 개를 사용하기도 하지만, Hidden Layer의 개수는 문제와 모델 구조에 따라 달라진다.
 
 각 Layer는 이전 Layer의 Activation을 받아 계산한다. 앞쪽 Layer가 단순한 패턴을, 뒤쪽 Layer가 그 조합을 다룬다고 생각할 수 있다. 숫자 이미지에서는 짧은 획과 획의 조합을 예로 들 수 있다.
 
@@ -43,15 +43,17 @@ Input과 Output 사이에는 Hidden Layer가 있다. 이 예시에는 Hidden Lay
 
 ## 3. Weight(가중치)와 Weighted Sum
 
-Neuron은 이전 Layer의 Activation에 Weight(가중치)를 곱한다. 그 결과를 모두 더한다.
+Fully Connected Layer(완전연결 계층)의 각 Neuron은 이전 Layer의 모든 Activation을 받는다. 각 Activation에 서로 다른 Weight(가중치)를 곱한 뒤 그 결과를 모두 더한다.
 
 $$
 w_1a_1+w_2a_2+w_3a_3+\cdots+w_na_n
 $$
 
-이 값이 Weighted Sum이다. 여기서 a는 이전 Neuron의 Activation이다. w는 각 연결의 Weight(가중치)이다.
+이 값이 Weighted Sum(가중합)이다. 여기서 a는 이전 Layer에 있는 Neuron의 Activation이다. w는 각 연결의 Weight이다.
 
-Weight(가중치)는 각 Activation이 계산에 기여하는 정도를 조절한다. 양수인지 음수인지에 따라서도 기여 방향이 달라진다.
+Weight는 이전 Layer의 각 Activation을 얼마나 강하게 반영할지 결정한다. Activation이 0 이상일 때 Positive Weight는 다음 Neuron의 Weighted Sum을 증가시키고, Negative Weight는 감소시킨다. Weight가 0이면 해당 Activation은 계산에 기여하지 않는다. 일반적으로 실제 기여의 방향과 크기는 Weight와 Activation을 곱한 값으로 결정된다.
+
+예를 들어 Activation이 0.8이라면 Weight 0.5의 기여값은 0.4이고, Weight −0.5의 기여값은 −0.4이다.
 
 ![하나의 Neuron이 계산하는 순서](/assets/img/deep-learning-fundamentals/neuron-computation.png){: style="max-width: 100%; height: auto;"}
 
@@ -59,7 +61,19 @@ Weight(가중치)는 각 Activation이 계산에 기여하는 정도를 조절�
 
 ### 3.1 Linear Combination
 
-각 Input에 계수를 곱해 더한 것이 Linear Combination이다. 앞의 Weighted Sum이 여기에 해당한다. Bias까지 더한 계산은 엄밀하게는 Affine Transformation이다. Bias를 포함해 편의상 “선형 Layer”라고 부르기도 한다.
+이전 Layer의 각 Activation에 해당 Weight를 곱한 뒤 모두 더한 Weighted Sum은 Activation들의 Linear Combination(선형결합)이다.
+
+$$
+\text{Weighted Sum}=w_1a_1+w_2a_2+\cdots+w_na_n
+$$
+
+여기에 Bias를 더한 계산은 Affine Transformation(아핀 변환)이다.
+
+$$
+z=w_1a_1+w_2a_2+\cdots+w_na_n+b
+$$
+
+Affine Layer(아핀 계층)는 이전 Layer의 각 Activation에 Weight를 곱해 더하고 Bias를 추가하는 계산을 수행한다. 즉, Neuron이 Activation Function을 적용하기 전의 계산 부분이다. Deep Learning Library에서는 Bias가 포함되어 있어도 편의상 Linear Layer라고 부르기도 한다.
 
 ## 4. Sigmoid와 Bias
 
@@ -68,12 +82,12 @@ Weight(가중치)는 각 Activation이 계산에 기여하는 정도를 조절�
 Weighted Sum을 그대로 전달하지 않고 Activation Function에 넣는다. 먼저 살펴볼 함수는 Sigmoid이다.
 
 $$
-\sigma(x)=\frac{1}{1+e^{-x}}
+\sigma(z)=\frac{1}{1+e^{-z}}
 $$
 
-Sigmoid는 값을 0과 1 사이로 바꾼다. 큰 음수는 0에 가까워진다. 큰 양수는 1에 가까워진다. x가 0이면 결과는 0.5이다.
+Sigmoid Function(시그모이드 함수)은 Neuron의 Weighted Sum과 Bias를 더한 값 z를 0과 1 사이의 Activation으로 변환한다. 큰 음수는 0에 가까워진다. 큰 양수는 1에 가까워진다. z가 0이면 결과는 0.5이다.
 
-이때 x는 Sigmoid에 들어가는 값이다. 이미지 전체를 뜻하는 기호는 아니다.
+z가 같은 크기만큼 변해도 Sigmoid Activation은 항상 같은 크기로 변하지 않는다. z가 0 근처에서는 비교적 빠르게 변한다. z가 매우 크거나 작으면 1 또는 0 근처에서 천천히 변한다. 이런 성질을 Non-linearity(비선형성)라고 한다. 이 성질 덕분에 여러 Layer를 연결한 Network가 직선만으로 구분하기 어려운 복잡한 Pattern을 표현할 수 있다.
 
 ### 4.2 Bias
 
@@ -85,23 +99,50 @@ $$
 
 여기서 −10이 더해지는 Bias이다. Weighted Sum이 10이면 Sigmoid에 들어가는 값은 0이다. 따라서 Activation은 0.5가 된다.
 
-Bias는 Neuron이 반응하는 기준을 옮긴다. Sigmoid는 부드럽게 변하므로 특정 기준에서 갑자기 켜지는 스위치는 아니다.
+Weight는 이전 Layer의 각 Activation을 얼마나 강하게 반영할지 결정한다. Bias(편향)는 Weighted Sum 전체를 이동시켜 Neuron이 어느 정도의 신호부터 반응할지 조절한다.
 
 Bias는 더하는 값으로 정의할 수 있다. 아래 행렬식에서는 Bias를 더한다. 이 표기에서 위 예시의 Bias는 −10이다.
 
 ### 4.3 Perceptron Model과 Threshold Function
 
-Perceptron은 Weighted Sum과 Bias로 두 Class를 구분하는 모델이다. Sigmoid 대신 Threshold Function을 사용하면 판단이 0 또는 1로 바로 결정된다.
+Perceptron(퍼셉트론)은 여러 Input을 받아 두 Class 중 하나를 선택하는 가장 단순한 Artificial Neuron Model이다. 각 Input에 Weight를 곱해 더하고 Bias를 추가한다. 마지막으로 Threshold Function(임계 함수)을 적용해 0 또는 1을 출력한다.
 
-**Weighted Sum + Bias가 0 이상 → 1 / 0 미만 → 0**
+$$
+\hat{y}=
+\begin{cases}
+1 & z\geq 0\\
+0 & z<0
+\end{cases}
+$$
+
+z가 0 이상이면 1을 출력하고, 0보다 작으면 0을 출력한다. 예를 들어 “Spam인가?”, “이 이미지가 숫자 3인가?”처럼 두 가지 중 하나를 판단할 수 있다.
+
+두 Input이 모두 1일 때만 1을 출력하는 AND 문제를 생각해 보자.
+
+$$
+z=x_1+x_2-1.5
+$$
+
+| x₁ | x₂ | z | Output |
+| --- | --- | --- | --- |
+| 0 | 0 | −1.5 | 0 |
+| 0 | 1 | −0.5 | 0 |
+| 1 | 0 | −0.5 | 0 |
+| 1 | 1 | 0.5 | 1 |
 
 Threshold Function은 경계에서 불연속적이다. Sigmoid처럼 부드럽게 변하지 않는다. 따라서 이 함수를 그대로 사용해 일반적인 Backpropagation으로 학습하는 것은 적절하지 않다. 고전적인 Perceptron은 별도의 Perceptron Learning Rule을 사용한다.
 
 ### 4.4 Decision Boundary와 Perceptron Learning Rule
 
-Decision Boundary는 예측 Class가 바뀌는 경계이다. Input이 두 개라면 단일 Perceptron의 경계는 직선이다. Input이 세 개라면 평면이다.
+Decision Boundary(결정 경계)는 예측 Class가 바뀌는 위치이다. Input이 두 개라면 데이터를 x₁과 x₂의 좌표로 나타낼 수 있다. Perceptron의 판단이 바뀌는 경계에서는 z가 0이다.
 
-학습할 때 정답 y와 예측값 ŷ를 비교한다. 둘 다 0 또는 1로 표현하자.
+$$
+w_1x_1+w_2x_2+b=0
+$$
+
+이 식은 좌표평면에서 직선이다. 직선의 한쪽에서는 0을, 반대쪽에서는 1을 출력한다. 앞의 AND 예제에서는 Decision Boundary가 x₁ + x₂ = 1.5이다. Input이 세 개이면 데이터를 3차원 공간에 나타낼 수 있고, 경계는 평면이 된다.
+
+Perceptron Learning Rule(퍼셉트론 학습 규칙)은 Perceptron이 틀린 예측을 했을 때 Weight와 Bias를 수정하는 방법이다. 학습할 때 정답 y와 예측값 ŷ를 비교한다. 둘 다 0 또는 1로 표현하자.
 
 | 결과 | y − ŷ | 업데이트 |
 | --- | --- | --- |
@@ -109,9 +150,19 @@ Decision Boundary는 예측 Class가 바뀌는 경계이다. Input이 두 개라
 | 정답 1, 예측 0 | +1 | Input 방향으로 Weight를 더하고 Bias를 높임 |
 | 정답 0, 예측 1 | −1 | Input 방향으로 Weight를 빼고 Bias를 낮춤 |
 
-정확한 규칙은 간단하다. 각 Weight에는 **Learning Rate × (y − ŷ) × 해당 Input**을 더한다. Bias에는 **Learning Rate × (y − ŷ)**를 더한다. Input이 음수라면 Weight 변화의 부호도 달라진다.
+각 Weight와 Bias는 다음 규칙으로 수정한다.
 
-예를 들어 Input이 (1, 0), 정답이 1, 예측이 0이고 Learning Rate가 0.1이라고 하자. 첫 Weight와 Bias에는 0.1을 더한다. 두 번째 Weight는 그대로 둔다. 이 Input을 다시 만났을 때 1로 판단하기 쉬워진다.
+$$
+w_i\leftarrow w_i+\eta(y-\hat{y})x_i
+$$
+
+$$
+b\leftarrow b+\eta(y-\hat{y})
+$$
+
+xᵢ는 i번째 Input이다. η는 Learning Rate(학습률)이다. Learning Rate는 한 번 틀렸을 때 값을 얼마나 크게 수정할지 정하는 Hyperparameter이다. 보통 0.1, 0.01, 0.001처럼 서로 다른 값을 실험하고 Validation Data의 결과를 비교해 선택한다. 너무 작으면 학습이 느리고, 너무 크면 적절한 값을 지나치며 학습이 흔들릴 수 있다.
+
+예를 들어 Input이 (1, 0), 정답이 1, 예측이 0이고 Learning Rate가 0.1이라고 하자. y − ŷ는 1이다. 첫 Weight에는 0.1 × 1 × 1을 더한다. 두 번째 Weight는 Input이 0이므로 변하지 않는다. Bias에는 0.1을 더한다. 그 결과 같은 Input에서 z가 커지고, 다음에는 1로 판단하기 쉬워진다.
 
 이것이 Perceptron Learning Rule이다. 선형 분리가 가능한 유한한 데이터에서는 표준 규칙이 유한 횟수의 오류 수정 후 분리 경계를 찾는다. 선형 분리가 불가능하면 수렴이 보장되지 않는다.
 
@@ -181,23 +232,52 @@ MLP는 Input Layer, 하나 이상의 Hidden Layer, Output Layer로 구성된 Fee
 
 ### 5.2 Non-linearity와 Non-linear Representation
 
-비선형 Activation Function을 제거하고 Affine Layer만 여러 개 쌓아 보자. 결과는 다시 하나의 Affine Transformation으로 합쳐진다. 깊어졌다는 이유만으로 XOR을 구분할 수는 없다.
+Non-linear Representation(비선형 표현)은 Input 사이의 복잡한 관계를 직선이나 평면에 제한되지 않는 형태로 나타내는 것이다.
 
-Hidden Layer의 비선형 변환은 이 제한을 벗어나게 한다. XOR에서는 “적어도 하나가 1인가?”와 “둘 다 1인가?” 같은 중간 특징을 만든 뒤 조합하면 된다. 첫 조건이 참이고 두 번째 조건이 거짓일 때 XOR은 1이다.
+먼저 Activation Function 없이 Affine Layer만 두 개 연결해 보자. 첫 번째 Layer와 두 번째 Layer가 다음과 같이 계산한다고 하자.
 
-이처럼 원래 Input을 구분하기 쉬운 새 특징으로 바꾸는 것이 Non-linear Representation의 역할이다. 실제 학습에서는 사람이 이런 규칙을 직접 정하기보다 데이터로 Weight를 조정한다.
+$$
+z_1=2x+1
+$$
+
+$$
+y=3z_1-4
+$$
+
+첫 번째 식을 두 번째 식에 넣으면 전체 Output은 다음과 같다.
+
+$$
+y=3(2x+1)-4=6x-1
+$$
+
+두 개의 Affine Layer를 사용했지만 하나의 Affine Layer와 같은 계산이다. Activation Function 없이 Affine Layer만 여러 개 연결하면 전체 계산은 다시 하나의 Affine Transformation으로 합쳐진다. 따라서 Hidden Layer를 추가해 Network를 깊게 만들어도 Decision Boundary는 여전히 직선이며 XOR을 구분할 수 없다.
+
+Layer 사이에 Sigmoid나 ReLU 같은 Non-linear Activation Function을 넣으면 전체 계산을 하나의 Affine Transformation으로 합칠 수 없다. Hidden Layer는 원래 Input을 구분하기 쉬운 Intermediate Feature(중간 특징)로 변환할 수 있다.
+
+XOR에서는 첫 번째 Hidden Neuron이 “두 Input 중 적어도 하나가 1인가?”를 판단하고, 두 번째 Hidden Neuron이 “두 Input이 모두 1인가?”를 판단한다고 생각할 수 있다.
+
+| x₁ | x₂ | 적어도 하나가 1인가? | 둘 다 1인가? | XOR |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 0 | 0 | 0 |
+| 0 | 1 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 0 |
+
+첫 번째 조건만 참일 때 XOR은 1이다. Output Layer는 두 Intermediate Feature를 조합하여 XOR을 판단한다. 실제 Training에서 각 Hidden Neuron이 반드시 OR와 AND라는 이름 그대로 학습하는 것은 아니다. 이 예시는 Hidden Layer가 XOR을 해결하는 원리를 쉽게 보여 준다.
 
 ### 5.3 Representation Learning
 
-모델이 문제에 필요한 특징 자체를 학습하는 것을 Representation Learning이라고 한다. 손글씨 분류에서는 Pixel을 그대로 비교하는 대신 Hidden Layer에서 유용한 조합을 만들 수 있다.
+Representation Learning(표현 학습)은 Network가 문제를 해결하는 데 필요한 특징을 데이터로부터 학습하는 과정이다. 손글씨 분류에서는 Pixel을 그대로 비교하는 대신 Hidden Layer가 선, 곡선, 모서리처럼 분류에 유용한 조합을 만들 수 있다. 즉, 원래 Input을 분류하기 쉬운 새로운 Representation(표현)으로 변환한다.
 
 특징 하나가 Neuron 하나에 명확히 대응할 필요는 없다. 여러 Neuron의 Activation이 함께 하나의 특징을 표현할 수 있다. 따라서 모든 Hidden Neuron에 “가로획 감지기”처럼 이름을 붙일 수 있는 것은 아니다.
 
 ### 5.4 Universal Approximation과 Network Depth
 
-Universal Approximation은 MLP의 표현 가능성에 대한 결과이다. 대표적으로, Sigmoid Hidden Layer의 폭을 충분히 늘리고 선형 Output을 사용하면 유계의 닫힌 입력 영역에서 연속 함수를 원하는 정확도로 근사할 수 있다.
+Universal Approximation(보편 근사)은 MLP가 충분히 많은 Hidden Neuron을 사용하면 일정한 Input 범위 안에서 연속적인 함수의 모양을 원하는 수준까지 비슷하게 표현할 수 있다는 결과이다. Hidden Layer의 폭은 한 Hidden Layer에 들어 있는 Neuron의 개수이다. 근사는 완전히 같지는 않아도 차이를 원하는 만큼 작게 만든다는 뜻이다.
 
-이 결과는 작은 Network가 모든 함수를 정확히 표현한다는 뜻이 아니다. 학습 알고리즘이 좋은 Weight를 찾는다는 보장도 아니다. 필요한 Neuron 수, 학습 데이터, Generalization은 별개의 문제이다.
+손글씨 분류에 연결하면, Neural Network가 Pixel 값과 숫자 Class 사이의 복잡한 관계를 표현할 능력이 있다는 뜻이다. 비슷한 손글씨 모양을 실제로 학습하는 과정은 Representation Learning에 해당한다.
+
+Universal Approximation은 작은 Network가 모든 함수를 정확히 표현한다는 뜻이 아니다. 필요한 Neuron의 수, 적절한 Weight를 쉽게 찾을 수 있는지, 새로운 데이터에서도 잘 예측하는지는 보장하지 않는다.
 
 Depth가 늘면 여러 단계의 특징을 조합할 수 있다. 어떤 함수는 얕고 매우 넓은 Network보다 깊은 Network에서 효율적으로 표현된다. 반면 계산 비용과 최적화의 어려움도 커진다. “깊을수록 항상 성능이 좋다”는 결론은 성립하지 않는다. [관련 설명: Deep Learning, Deep Feedforward Networks](https://www.deeplearningbook.org/contents/mlp.html).
 
@@ -219,9 +299,23 @@ a가 음수이면 0을 출력한다. 양수이면 a를 그대로 출력한다.
 
 ## 7. Cost(Loss): 예측과 정답의 차이
 
-학습 초기의 예측은 정답과 다를 수 있다. 이 차이를 숫자로 나타낸 것이 Cost(Loss)이다.
+Cost 또는 Loss는 Training을 마친 뒤에만 계산하는 값이 아니다. Training 과정에서 Forward Propagation으로 Prediction을 만든 다음, 예측이 정답에서 얼마나 벗어났는지 계산하는 값이다.
 
-각 Output과 정답의 차이를 제곱한다. 그 값을 모두 더한다. 아래는 숫자 3을 분류할 때의 계산 일부이다.
+Training에서는 **Input → Forward Propagation → Prediction → Loss 계산 → Backpropagation → Parameter Update**의 순서를 반복한다.
+
+여기서 Parameter(매개변수)는 Training으로 수정하는 Weight와 Bias를 뜻한다. Activation은 Input과 Parameter로 계산되는 중간 결과이며 직접 수정하는 Parameter가 아니다.
+
+손글씨 숫자 0부터 9까지 분류한다면 Output Layer에는 10개의 Neuron이 있다. 각 Output은 해당 Output Neuron의 Activation, 즉 각 숫자에 대한 예측값이다. 최종 선택된 숫자 자체를 뜻하지 않는다.
+
+정답이 숫자 3이라면 숫자 3의 목표값만 1이고 나머지는 0이다.
+
+$$
+\mathbf{y}=[0,0,0,1,0,0,0,0,0,0]
+$$
+
+정답 Class의 위치만 1로 나타내는 방식을 One-hot Encoding(원-핫 인코딩)이라고 한다.
+
+학습 원리를 간단히 보기 위해 각 Output과 목표값의 차이를 제곱하고 모두 더해 보자. 아래는 숫자 3을 분류할 때의 계산 일부이다.
 
 $$
 \begin{aligned}
@@ -229,8 +323,6 @@ $$
 &\quad +(0.88-1.00)^2+\cdots
 \end{aligned}
 $$
-
-정답은 숫자 3이다. 숫자 3에 대응하는 목표값은 1이다. 나머지 숫자의 목표값은 0이다.
 
 따라서 정답에 해당하는 Output은 1에 가까워야 한다. 나머지 Output은 0에 가까워야 한다. 예측과 목표의 차이가 커질수록 Cost가 커진다.
 
@@ -240,12 +332,14 @@ $$
 
 제곱오차는 학습 원리를 설명하기에 간단하다. 실제 분류에서는 Output의 의미에 맞춰 Loss Function을 선택한다.
 
-| 문제 | Output 구성 | 대표 Loss |
+| 문제 | Output 계산 | Loss |
 | --- | --- | --- |
-| Binary Classification | Sigmoid 하나로 Class 1의 확률을 모델링 | Binary Cross-Entropy |
-| Multi-class Classification | Class별 Logit을 Softmax로 변환 | Categorical Cross-Entropy |
+| Binary Classification(이진 분류) | 하나의 Logit을 Sigmoid로 변환하여 Class 1의 예측 확률을 계산 | Binary Cross-Entropy(이진 교차 엔트로피) |
+| Multi-class Classification(다중 클래스 분류) | 각 Class의 Logit을 Softmax로 변환하여 Class별 예측 확률을 계산 | Categorical Cross-Entropy(범주형 교차 엔트로피) |
 
-Logit은 확률로 변환하기 전의 점수이다. 여기서는 마지막 Layer의 Weighted Sum과 Bias를 더한 값이다.
+Logit(로짓)은 Output Layer에서 Weighted Sum과 Bias를 더한 값이다. 아직 Sigmoid나 Softmax를 적용하기 전의 점수이므로 음수나 1보다 큰 값도 가능하다. Logit 자체는 확률이 아니다.
+
+Classification의 계산 순서는 **이전 Layer의 Activation → Weighted Sum과 Bias → Logit → Sigmoid 또는 Softmax → 예측 확률 → Cross-Entropy Loss**이다.
 
 ### 7.2 Binary Classification: Sigmoid
 
@@ -257,48 +351,85 @@ Logit은 확률로 변환하기 전의 점수이다. 여기서는 마지막 Laye
 
 ### 7.3 Multi-class Classification: Softmax
 
-숫자 0–9 중 하나를 고르는 문제에는 서로 배타적인 Class가 10개 있다. Softmax는 10개의 Logit을 비교해, 모든 성분이 양수이고 합이 1인 확률 분포로 바꾼다.
+숫자 0–9 중 하나를 고르는 문제에는 서로 배타적인 Class가 10개 있다. 하나의 이미지가 숫자 3과 숫자 7에 동시에 해당하지 않고 하나의 정답만 가진다는 뜻이다. Output Layer의 10개 Neuron은 각 숫자에 대한 Logit을 계산한다. 높은 Logit은 Network가 해당 Class라고 더 강하게 판단했다는 뜻이다.
 
-계산은 **각 Logit에 지수함수 적용 → 그 결과의 전체 합으로 나누기**이다. 예를 들어 Logit이 (0, 0, 0)이면 세 확률은 모두 1/3이다. (2, 1, 0)이면 약 (0.665, 0.245, 0.090)이 된다.
+Softmax Function(소프트맥스 함수)은 모든 Logit을 비교하여 합이 1인 Class별 예측 확률로 바꾼다. 계산은 **각 Logit에 지수함수 적용 → 그 결과의 전체 합으로 나누기**이다.
 
-Sigmoid를 각 성분에 따로 적용하면 합이 1이라는 보장이 없다. Softmax는 Class 사이의 상대적인 점수를 함께 반영한다. 최종 예측은 보통 가장 큰 확률의 Class이다.
+Class가 세 개이고 Logit이 (2, 1, 0)이라고 하자.
+
+| Class | Logit | 지수함수 결과 | Softmax 확률 |
+| --- | --- | --- | --- |
+| Class 1 | 2 | 7.389 | 7.389 ÷ 11.107 ≈ 0.665 |
+| Class 2 | 1 | 2.718 | 2.718 ÷ 11.107 ≈ 0.245 |
+| Class 3 | 0 | 1 | 1 ÷ 11.107 ≈ 0.090 |
+
+지수함수의 결과는 항상 Positive이므로 음수 Logit도 Positive 값으로 바뀐다. 세 지수함수 결과의 합은 11.107이다. 각 값을 이 합으로 나누면 Softmax 확률 (0.665, 0.245, 0.090)을 얻는다. 세 확률의 합은 1이며, 가장 높은 확률을 가진 Class 1을 최종 예측으로 선택한다.
+
+Logit이 (0, 0, 0)처럼 모두 같으면 지수함수 결과도 모두 1이다. 따라서 세 Class의 확률은 각각 1/3이 된다. Network가 어느 Class도 더 강하게 선택하지 않은 상태이다.
+
+Sigmoid를 각 Logit에 따로 적용하면 (0.8, 0.7, 0.6)처럼 합이 1보다 큰 결과가 나올 수 있다. Softmax는 한 Class의 확률이 높아지면 다른 Class에 배분되는 확률이 줄어들도록 모든 Logit을 함께 비교한다. 따라서 여러 Class 중 하나만 정답인 Multi-class Classification에 적합하다.
 
 ### 7.4 Cross-Entropy Loss
 
-One-hot 정답을 사용하는 Multi-class Classification에서는 정답 Class에 부여한 확률 p만 보면 된다. 개별 example의 Cross-Entropy Loss는 **−log(p)**이다.
+One-hot 정답을 사용하는 Multi-class Classification에서는 정답 Class에 부여한 확률 p를 사용한다. 개별 example은 Training Data 한 개를 뜻한다. Cross-Entropy Loss는 다음과 같다.
 
-정답에 0.9를 부여하면 Loss는 약 0.105이다. 0.1만 부여하면 약 2.303이다. 자연로그 기준이다. 정답을 확신할수록 Loss가 작고, 틀린 Class를 강하게 확신할수록 Loss가 커진다.
+$$
+L=-\log(p)
+$$
+
+예를 들어 Class가 고양이, 개, 새이고 정답이 개라면 One-hot 정답은 (0, 1, 0)이다. Softmax Prediction이 (0.2, 0.7, 0.1)이면 정답 Class인 개에 부여한 확률 p는 0.7이다.
+
+$$
+L=-\log(0.7)\approx0.357
+$$
+
+One-hot 정답에서 정답 위치만 1이므로 계산에는 정답 Class의 확률만 남는다. 다른 Class의 확률을 완전히 무시하는 것은 아니다. Softmax 확률의 합은 1이므로 다른 Class에 높은 확률을 주면 정답 Class의 확률이 작아지고 Loss가 커진다.
+
+| 정답 Class의 확률 p | Cross-Entropy Loss −log(p) |
+| --- | --- |
+| 0.9 | 약 0.105 |
+| 0.7 | 약 0.357 |
+| 0.5 | 약 0.693 |
+| 0.1 | 약 2.303 |
+
+자연로그 기준이다. 정답 Class에 높은 확률을 주면 Loss가 작고, 낮은 확률을 주면 Loss가 크게 증가한다. 이 특성 때문에 Categorical Cross-Entropy는 One-hot 정답을 사용하는 Multi-class Classification에 적합하다.
 
 Binary Cross-Entropy도 같은 원리이다. 정답이 1이면 Sigmoid의 p를, 정답이 0이면 1−p를 정답 확률로 사용한다. [Softmax와 Cross-Entropy 설명](https://d2l.ai/chapter_linear-classification/softmax-regression.html).
 
-### 7.5 Training과 Inference
+### 7.5 Training과 Inference(추론)
 
-Training에서는 정답이 있는 데이터로 Forward Propagation, Loss 계산, Backpropagation, Parameter Update를 수행한다.
+Training과 Inference는 Deep Learning Model을 학습하고 사용하는 두 단계이다. 둘 다 학습 과정이라는 뜻은 아니다.
 
-Inference에서는 학습한 Parameter로 새로운 Input의 Output을 계산한다. 정답을 입력하지 않아도 예측할 수 있다. 일반적인 Inference에서는 Gradient 계산과 Parameter Update를 하지 않는다. Input 정규화 등 전처리는 학습 때의 기준을 유지한다.
+| Training(학습) | Inference(추론) |
+| --- | --- |
+| Training Data와 정답을 사용 | 새로운 Input을 사용 |
+| Forward Propagation과 Loss 계산 | Forward Propagation으로 Prediction 계산 |
+| Backpropagation 수행 | Backpropagation을 수행하지 않음 |
+| Weight와 Bias 수정 | Weight와 Bias를 수정하지 않음 |
+
+Inference(추론)는 Training을 마친 Model에 새로운 Input을 넣어 Prediction을 얻는 과정이다. 정답을 입력하지 않아도 예측할 수 있다. Input 정규화 등 전처리는 Training 때의 기준을 유지한다.
 
 ## 8. Neural Network와 Cost Function
 
-같은 Network를 두 관점에서 살펴보자.
+Neural Network와 Cost Function은 서로 다른 역할을 한다. Neural Network는 Input Data를 받아 Prediction을 만든다. Cost Function은 Prediction과 실제 정답을 비교해 Cost를 계산한다.
 
-| 구분 | Input | Output |
-| --- | --- | --- |
-| Neural Network | 784개의 Pixel 값 | 10개의 숫자 |
-| Cost Function | 13,002개의 Weight(가중치)와 Bias | Cost 하나 |
+전체 계산 순서는 **Input Data → Neural Network → Prediction → Cost Function → Cost**이다.
 
-Neural Network는 현재 Weight(가중치)와 Bias로 예측을 계산한다. Cost Function은 그 설정이 얼마나 좋은지 평가한다. 이때 Training Dataset을 기준으로 예측과 정답을 비교한다.
+Weight와 Bias가 바뀌면 Prediction이 달라지고, 그 결과 Cost도 달라진다. Training은 Cost가 작아지는 방향으로 Weight와 Bias를 수정하는 과정이다.
 
-13,002개는 이 예시 Network의 Parameter 수이다. 모든 Neural Network가 같은 수의 Parameter를 갖는 것은 아니다.
+이 예시 Network에는 13,002개의 Weight와 Bias가 있다. 이 Parameter들은 Network 전체에 나뉘어 있으며, 하나의 Neuron 안에 들어 있는 것이 아니다. 13,002개는 이 예시만의 Parameter 수이며 모든 Neural Network가 같은 수를 갖는 것은 아니다.
 
 Training Dataset은 Parameter를 조정하는 데 사용한다. Test Dataset은 학습에 사용하지 않은 데이터에서 성능을 확인하는 데 사용한다.
 
 ### 8.1 Model Capacity, Overfitting, Generalization
 
-Model Capacity는 모델이 얼마나 다양한 관계를 표현할 수 있는지를 뜻한다. Layer의 폭과 깊이, Activation Function 등이 영향을 준다. Parameter 수는 참고 지표이지만 Capacity를 완전히 설명하지는 않는다.
+Model Capacity(모델 용량)는 모델이 얼마나 다양하고 복잡한 관계를 표현할 수 있는지를 뜻한다. Layer의 폭과 깊이, Activation Function 등이 영향을 준다. Parameter 수는 참고 지표이지만 Capacity를 완전히 설명하지는 않는다.
 
-Capacity가 부족하면 Training Data의 규칙도 충분히 표현하지 못할 수 있다. 반대로 모델이 Training Data의 잡음이나 우연한 패턴까지 따라가면 Overfitting이 생길 수 있다.
+Capacity가 부족하면 Training Data에서 반복해서 나타나는 Input과 정답 사이의 Pattern을 충분히 학습하지 못할 수 있다. 반대로 모델이 Training Data에만 있는 잡음이나 우연한 차이까지 지나치게 맞추면 Overfitting(과적합)이 생길 수 있다.
 
-Generalization은 학습하지 않은 데이터에서도 유용한 예측을 하는 능력이다. Training Loss가 줄어드는 동안 Validation Loss가 지속적으로 커진다면 Overfitting을 의심할 수 있다. 다만 데이터 분포 차이도 확인해야 한다.
+Generalization(일반화)은 Training에 직접 사용하지 않은 새로운 데이터도 잘 예측하는 능력이다. Training Loss는 Training Data에서의 오차이다. Validation Loss는 Weight와 Bias를 학습하는 데 사용하지 않은 Validation Data에서의 오차이다.
+
+학습 초반에는 두 Loss가 함께 작아질 수 있다. 하지만 Training Loss는 계속 작아지는데 Validation Loss가 일정 기간 커진다면, Model이 Training Data에 지나치게 맞춰져 새로운 데이터를 잘 예측하지 못할 가능성이 있다. 이때 Overfitting을 의심한다. 단 한 번의 작은 변화만으로 판단하지 않고 일정 기간의 추세와 데이터 분포도 함께 확인한다.
 
 | 데이터 구분 | 용도 |
 | --- | --- |
@@ -312,11 +443,19 @@ Test 결과를 반복해서 보고 설정을 고르면 Test도 간접적으로 �
 
 ### 9.1 Cost를 줄이는 방향
 
-Weight(가중치)와 Bias를 바꾸면 Cost도 변한다. 학습에서는 Cost가 작아지는 방향을 찾는다.
+Weight와 Bias를 바꾸면 Prediction이 달라지고 Cost도 변한다. 학습에서는 Cost가 작아지는 방향을 찾는다.
 
-먼저 하나의 Weight에 대한 Cost 그래프를 생각해 보자. 현재 위치의 기울기를 보면 어느 방향으로 움직일지 판단할 수 있다.
+먼저 하나의 Weight만 바꾸고 다른 Parameter는 고정한 Cost 그래프를 생각해 보자. 가로축은 Weight이고 세로축은 Cost인 2차원 곡선이다. 현재 위치의 기울기를 보면 어느 방향으로 움직일지 판단할 수 있다.
 
-여러 Parameter를 함께 다룰 때 사용하는 것이 Gradient이다. Gradient는 각 Parameter에 대한 편미분을 모은 값이다.
+Weight 두 개를 함께 바꾸면 두 Weight와 Cost를 축으로 하는 3차원 표면으로 나타낼 수 있다. 실제 Neural Network의 Cost는 Network 전체의 많은 Weight와 Bias에 의해 결정되므로 고차원 함수이다. Parameter가 n개라면 다음과 같이 표현할 수 있다.
+
+$$
+C=C(\theta_1,\theta_2,\ldots,\theta_n)
+$$
+
+여기서 각 θ는 하나의 Weight 또는 Bias이다. 하나의 Weight에 대한 2차원 Cost 그래프는 이 고차원 함수에서 다른 Parameter를 고정하고 한 방향만 잘라 본 단면이다.
+
+여러 Parameter를 함께 다룰 때 사용하는 것이 Gradient이다. Gradient는 각 Parameter에 대한 편미분을 모은 값이다. Cost Function이 미분 가능한 위치라면 Parameter가 몇 개이든 각 Parameter에 대한 편미분을 계산할 수 있다. ReLU가 0인 지점처럼 미분값이 하나로 정해지지 않는 곳에서는 실제 구현이 사용할 값을 정해 계산한다.
 
 ### 9.2 음의 Gradient
 
@@ -330,7 +469,7 @@ $$
 
 Gradient는 Cost가 가장 빠르게 증가하는 국소 방향을 나타낸다. 음의 Gradient는 반대 방향이다. 이는 유클리드 거리 기준의 설명이다.
 
-각 성분의 부호는 해당 Parameter를 늘릴지 줄일지 알려 준다. 크기는 현재 위치에서의 변화 민감도를 나타낸다.
+여기서 Parameter는 Activation이 아니라 Training으로 수정하는 Weight와 Bias이다. Gradient의 각 성분은 하나의 Parameter에 대응한다. 편미분이 Positive이면 그 Parameter를 증가시킬 때 Cost가 증가하므로, Cost를 줄이기 위해 Parameter를 감소시킨다. 편미분이 Negative이면 Parameter를 증가시킬 때 Cost가 감소하므로 Parameter를 증가시킨다. 편미분의 절댓값은 현재 위치에서 해당 Parameter의 변화에 Cost가 얼마나 민감한지를 나타낸다.
 
 음의 Gradient 방향으로 조금 이동한다. 새 위치에서 다시 Gradient를 계산한다. 이 과정을 반복하는 방법이 경사하강법(Gradient Descent)이다.
 
@@ -359,9 +498,13 @@ $$
 
 ### 9.4 Local Minimum과 Global Minimum
 
-Local Minimum은 주변보다 낮은 지점이다. Global Minimum은 전체에서 가장 낮은 지점이다.
+Local Minimum(지역 최솟값)은 주변보다 낮지만 Cost Function 전체에서 가장 낮지는 않을 수 있는 지점이다. Global Minimum(전역 최솟값)은 전체에서 가장 낮은 지점이다.
 
-경사하강법(Gradient Descent)이 항상 Global Minimum을 찾는 것은 아니다. 또한 Gradient가 0인 지점이 반드시 최솟값인 것도 아니다. 학습 과정에서는 Cost와 평가 성능을 함께 확인해야 한다.
+Gradient Descent는 Cost Function 전체를 미리 보고 이동하지 않는다. 현재 위치의 Gradient만 사용해 Cost가 작아지는 방향으로 이동한다. 따라서 Local Minimum에 도착하거나 매우 평평한 구간에서 이동이 느려질 수 있으며, 항상 Global Minimum을 찾는 것은 아니다.
+
+Gradient가 0인 지점도 반드시 Minimum은 아니다. 골짜기 바닥인 Minimum일 수 있지만, 산꼭대기인 Maximum이나 방향에 따라 올라가기도 하고 내려가기도 하는 Saddle Point(안장점)일 수도 있다.
+
+또한 Training Loss가 작아져도 Overfitting으로 Validation 성능이 나빠질 수 있다. 따라서 학습 과정에서는 Training Loss뿐 아니라 Validation Loss와 Accuracy 같은 평가 성능도 함께 확인한다.
 
 ![예측 오차와 Cost를 줄이는 과정](/assets/img/deep-learning-fundamentals/loss-and-gradient.png){: style="max-width: 100%; height: auto;"}
 
