@@ -181,7 +181,7 @@ $$
                   w(L)
 ```
 
-∂C₀/∂w⁽ᴸ⁾을 구하려면 C₀에서 w⁽ᴸ⁾까지 내려가는 경로를 따라가며, 그 경로에 있는 변화율을 전부 곱한다. Node가 여러 갈래로 나뉘는 경우(하나의 Activation이 여러 Neuron과 연결된 경우)에는 각 경로의 곱을 구한 뒤 더한다. “한 경로의 변화율은 곱하고, 여러 경로의 영향은 더한다”는 10절의 기준이 이 Tree 구조에서 그대로 나온다.
+∂C₀/∂w⁽ᴸ⁾을 구하려면 C₀에서 w⁽ᴸ⁾까지 내려가는 경로를 따라가며, 그 경로에 있는 변화율을 전부 곱한다. Node가 여러 갈래로 나뉘는 경우(하나의 Activation이 여러 Neuron과 연결된 경우)에는 각 경로의 곱을 구한 뒤 더한다. “한 경로의 변화율은 곱하고, 여러 경로의 영향은 더한다”는 9절의 기준이 이 Tree 구조에서 그대로 나온다.
 
 ## 5. 세 구간을 직접 미분하기
 
@@ -363,6 +363,14 @@ Mini-batch는 데이터를 나눠 업데이트하는 방식이다. Backpropagati
 | SGD: example 하나 | 빠르게 업데이트 가능, 한 번에 필요한 메모리가 작음 | Gradient의 변동이 크고 GPU 병렬 처리 효율이 낮을 수 있음 |
 | Mini-batch SGD | 병렬 처리와 업데이트 빈도의 절충 | Batch Size 선택에 따라 메모리와 Gradient 변동이 달라짐 |
 
+사실 이 세 방법은 서로 다른 알고리즘이 아니라, 한 번 업데이트할 때 몇 개의 Training Example로 Gradient를 평균 내는지에 따라 나뉘는 하나의 스펙트럼이다. Training Example이 1,000개라면 다음과 같다.
+
+- Batch Size = 1,000(전체) → Batch Gradient Descent. 1 Epoch당 업데이트 1회.
+- Batch Size = 1 → SGD. 1 Epoch당 업데이트 1,000회.
+- Batch Size = 100처럼 그 사이 값 → Mini-batch SGD. 1 Epoch당 업데이트 10회.
+
+Batch Size가 작을수록 업데이트는 빠르고 잦아지지만 Gradient의 변동이 커지고, Batch Size가 클수록 Gradient는 정확해지지만 업데이트 한 번의 비용이 커진다.
+
 무작위 추출을 적절히 하면 Mini-batch 평균은 전체 Gradient의 추정값이 된다. Batch Size를 키우면 보통 추정의 변동은 줄지만, 업데이트 하나의 연산량과 메모리가 늘어난다. 같은 Epoch 수에서는 업데이트 횟수도 줄어든다. 큰 Batch가 항상 더 빠르거나 Generalization에 더 좋은 것은 아니다. [Mini-batch SGD의 계산 특성](https://d2l.ai/chapter_optimization/minibatch-sgd.html).
 
 ### 8.2 Epoch, Batch Size, Iteration
@@ -381,66 +389,11 @@ Training example이 1,000개이고 Batch Size가 100이면, 10 Iterations가 1 E
 
 **그림 읽기.** 한 줄 전체가 1 Epoch이다. 작은 묶음마다 Gradient를 구하고 Parameter를 한 번 바꾼다. 다음 Epoch에서는 다시 데이터 전체를 순회한다.
 
-## 9. 한 Layer에 Neuron이 여러 개라면?
-
-이제 마지막 Layer에 여러 Output Neuron이 있다고 하자. 하나의 example에 대한 Cost는 각 Output의 제곱오차를 더한 값이다.
-
-$$
-C_0=\sum_{j=0}^{n_L-1}\left(a_j^{(L)}-y_j\right)^2
-$$
-
-n_L은 마지막 Layer의 Neuron 수이다. j는 마지막 Layer의 Neuron 번호이다. 각 Output은 자신에게 대응하는 목표값과 비교한다.
-
-각 Neuron의 계산 원리는 앞과 같다. 달라지는 것은 연결을 구분하는 아래첨자이다.
-
-- j: 현재 Layer의 Neuron 번호이다.
-- k: 이전 Layer의 Neuron 번호이다.
-- w의 아래첨자 jk: 이전 Neuron k에서 현재 Neuron j로 향하는 연결이다.
-
-이 절의 k는 Neuron 번호이다. 앞 절의 데이터 평균식에서 사용한 example 번호와는 문맥이 다르다.
-
-### 9.1 하나의 연결에 대한 Gradient
-
-하나의 Weight가 Cost에 미치는 경로는 여전히 세 구간이다.
-
-$$
-\frac{\partial C_0}{\partial w_{jk}^{(L)}}
-=
-\frac{\partial z_j^{(L)}}{\partial w_{jk}^{(L)}}
-\frac{\partial a_j^{(L)}}{\partial z_j^{(L)}}
-\frac{\partial C_0}{\partial a_j^{(L)}}
-$$
-
-연결 번호가 추가되었지만 원리는 같다. Weight가 z를 바꾸고, z가 Activation을 바꾸고, Activation이 Cost를 바꾼다.
-
-![한 Hidden Activation의 여러 경로](/assets/img/backpropagation/09-branches.svg){: style="max-width: 100%; height: auto;"}
-
-**그림 읽기.** Hidden Activation에서 Cost까지 두 경로가 있다. 각 경로의 미분을 곱한 뒤 두 기여를 더한다. 아래 합 기호가 바로 이 과정을 나타낸다.
-
-### 9.2 이전 Activation에는 여러 경로가 연결된다
-
-이전 Layer의 Neuron 하나는 여러 Output Neuron에 연결된다. 따라서 그 Activation이 Cost에 미치는 영향도 여러 경로를 거친다.
-
-각 경로에서는 변화율을 곱한다. 여러 경로의 영향은 더한다.
-
-$$
-\frac{\partial C_0}{\partial a_k^{(L-1)}}
-=
-\sum_{j=0}^{n_L-1}
-\frac{\partial z_j^{(L)}}{\partial a_k^{(L-1)}}
-\frac{\partial a_j^{(L)}}{\partial z_j^{(L)}}
-\frac{\partial C_0}{\partial a_j^{(L)}}
-$$
-
-합을 구하는 대상은 바로 다음 Layer의 Neuron들이다. Network의 모든 Layer를 한 번에 합하는 식은 아니다.
-
-서로 반대 부호를 가진 경로는 일부 상쇄될 수 있다. 같은 방향의 경로는 더해진다. 이렇게 모인 결과가 이전 Layer로 전달된다.
-
 ![Forward, Backpropagation, Gradient Descent의 역할](/assets/img/backpropagation/11-summary.svg){: style="max-width: 100%; height: auto;"}
 
 **그림 읽기.** 왼쪽은 값을 계산하고, 가운데는 변화율을 계산한다. 실제로 Weight와 Bias를 바꾸는 단계는 오른쪽이다.
 
-## 10. Backpropagation을 이해하는 세 가지 기준
+## 9. Backpropagation을 이해하는 세 가지 기준
 
 **첫째, Forward 값을 먼저 계산한다.** Backpropagation에는 각 Layer의 Activation과 z가 필요하다. Output을 계산한 뒤 그 계산 경로를 거꾸로 따라간다.
 
