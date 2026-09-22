@@ -355,18 +355,18 @@ Classification의 계산 순서는 **이전 Layer의 Activation → Weighted Sum
 
 Softmax Function(소프트맥스 함수)은 모든 Logit을 비교하여 합이 1인 Class별 예측 확률로 바꾼다. 계산은 **각 Logit에 지수함수 적용 → 그 결과의 전체 합으로 나누기**이다.
 
-Class가 총 \(K\)개일 때, \(j\)번째 Class의 확률은 다음과 같다.
+Class가 총 $K$개일 때, $j$번째 Class의 확률은 다음과 같다.
 
 $$
 p_j=\frac{e^{z_j}}{\displaystyle\sum_{k=1}^{K}e^{z_k}}
 $$
 
-- \(z_j\): \(j\)번째 Class의 Logit
-- \(e^{z_j}\): Logit에 지수함수를 적용한 Positive 값
-- \(K\): 전체 Class의 수
-- \(p_j\): \(j\)번째 Class의 예측 확률
+- $z_j$: $j$번째 Class의 Logit
+- $e^{z_j}$: Logit에 지수함수를 적용한 Positive 값
+- $K$: 전체 Class의 수
+- $p_j$: $j$번째 Class의 예측 확률
 
-분모는 모든 Class의 \(e^{z_k}\)를 더한 값이다. 모든 Class가 같은 분모를 사용하므로 각 확률의 합은 1이 된다.
+분모는 모든 Class의 $e^{z_k}$를 더한 값이다. 모든 Class가 같은 분모를 사용하므로 각 확률의 합은 1이 된다.
 
 Class가 세 개이고 Logit이 (2, 1, 0)이라고 하자.
 
@@ -388,48 +388,48 @@ Cross-Entropy Loss(교차 엔트로피 손실)는 모델이 **정답에 얼마�
 
 #### 7.4.1 Binary Cross-Entropy(이진 교차 엔트로피)
 
-Binary Classification에서는 Output Logit \(z\)에 Sigmoid를 적용한다.
+Binary Classification에서는 Output Logit $z$에 Sigmoid를 적용한다.
 
 $$
 p=\sigma(z)
 $$
 
-여기서 \(p\)는 모델이 예측한 Class 1의 확률이다. 즉 \(p=P(y=1\mid x)\)로 해석한다. \(x\)는 Input이고, \(y\)는 정답이다.
+여기서 $p$는 모델이 예측한 Class 1의 확률이다. 즉 $p=P(y=1\mid x)$로 해석한다. $x$는 Input이고, $y$는 정답이다.
 
-정답 \(y\)는 0 또는 1이다. 개별 example의 Binary Cross-Entropy는 다음과 같다.
+정답 $y$는 0 또는 1이다. 개별 example의 Binary Cross-Entropy는 다음과 같다.
 
 $$
 L=-\left[y\log(p)+(1-y)\log(1-p)\right]
 $$
 
-- 정답이 \(y=1\)이면 \(L=-\log(p)\)만 남는다.
-- 정답이 \(y=0\)이면 \(L=-\log(1-p)\)만 남는다.
+- 정답이 $y=1$이면 $L=-\log(p)$만 남는다.
+- 정답이 $y=0$이면 $L=-\log(1-p)$만 남는다.
 
-따라서 정답이 1일 때는 \(p\)가 1에 가까울수록 좋다. 정답이 0일 때는 \(p\)가 0에 가까울수록 좋다.
+따라서 정답이 1일 때는 $p$가 1에 가까울수록 좋다. 정답이 0일 때는 $p$가 0에 가까울수록 좋다.
 
-예를 들어 정답이 1이고 \(p=0.9\)라면 Loss는 약 0.105이다. 같은 정답에 \(p=0.1\)을 예측하면 Loss는 약 2.303이다.
+예를 들어 정답이 1이고 $p=0.9$라면 Loss는 약 0.105이다. 같은 정답에 $p=0.1$을 예측하면 Loss는 약 2.303이다.
 
-Sigmoid의 출력이 0과 1 사이라는 이유만으로 자동으로 확률이 되는 것은 아니다. Output Neuron을 “Class 1”로 정의하고, Binary Cross-Entropy로 학습할 때 \(p\)를 Class 1의 예측 확률로 해석한다.
+Sigmoid의 출력이 0과 1 사이라는 이유만으로 자동으로 확률이 되는 것은 아니다. Output Neuron을 “Class 1”로 정의하고, Binary Cross-Entropy로 학습할 때 $p$를 Class 1의 예측 확률로 해석한다.
 
 #### 7.4.2 Categorical Cross-Entropy(범주형 교차 엔트로피)
 
-서로 배타적인 Class가 여러 개이면 Softmax와 Categorical Cross-Entropy를 함께 사용한다. One-hot 정답을 \(y_j\), Softmax가 만든 \(j\)번째 Class의 확률을 \(p_j\)라고 하자.
+서로 배타적인 Class가 여러 개이면 Softmax와 Categorical Cross-Entropy를 함께 사용한다. One-hot 정답을 $y_j$, Softmax가 만든 $j$번째 Class의 확률을 $p_j$라고 하자.
 
 $$
 L=-\sum_{j=1}^{K}y_j\log(p_j)
 $$
 
-- \(K\): 전체 Class의 수
-- \(y_j\): \(j\)번째 위치의 One-hot 정답. 정답 Class만 1이고 나머지는 0이다.
-- \(p_j\): Softmax가 만든 \(j\)번째 Class의 예측 확률
+- $K$: 전체 Class의 수
+- $y_j$: $j$번째 위치의 One-hot 정답. 정답 Class만 1이고 나머지는 0이다.
+- $p_j$: Softmax가 만든 $j$번째 Class의 예측 확률
 
-정답 위치의 \(y_j\)만 1이므로 실제 계산에는 정답 Class의 확률만 남는다.
+정답 위치의 $y_j$만 1이므로 실제 계산에는 정답 Class의 확률만 남는다.
 
 $$
 L=-\log(p_{\text{correct}})
 $$
 
-예를 들어 정답이 “개”이고 One-hot 정답이 \((0,1,0)\)이라고 하자. Softmax Prediction이 \((0.2,0.7,0.1)\)이면 \(p_{\text{correct}}=0.7\)이다.
+예를 들어 정답이 “개”이고 One-hot 정답이 $(0,1,0)$이라고 하자. Softmax Prediction이 $(0.2,0.7,0.1)$이면 $p_{\text{correct}}=0.7$이다.
 
 $$
 L=-\log(0.7)\approx0.357
@@ -439,8 +439,8 @@ $$
 
 | 구분 | 예측 확률 | 정답 | Loss가 작아지는 경우 |
 | --- | --- | --- | --- |
-| Binary Cross-Entropy | Sigmoid가 만든 Class 1 확률 \(p\) | \(y\in\{0,1\}\) | 정답이 1이면 \(p\to1\), 정답이 0이면 \(p\to0\) |
-| Categorical Cross-Entropy | Softmax가 만든 Class별 확률 \(p_j\) | One-hot \(y_j\) | 정답 Class의 \(p_j\to1\) |
+| Binary Cross-Entropy | Sigmoid가 만든 Class 1 확률 $p$ | $y\in\{0,1\}$ | 정답이 1이면 $p\to1$, 정답이 0이면 $p\to0$ |
+| Categorical Cross-Entropy | Softmax가 만든 Class별 확률 $p_j$ | One-hot $y_j$ | 정답 Class의 $p_j\to1$ |
 
 ### 7.5 Training과 Inference(추론)
 
@@ -502,9 +502,9 @@ $$
 C_{\text{total}}=C_{\text{data}}+\lambda\sum_i w_i^2
 $$
 
-- \(C_{\text{data}}\): Prediction과 정답에서 계산한 원래 Cost
-- \(w_i\): 각 Weight
-- \(\lambda\): 큰 Weight에 줄 불이익의 강도를 정하는 Hyperparameter
+- $C_{\text{data}}$: Prediction과 정답에서 계산한 원래 Cost
+- $w_i$: 각 Weight
+- $\lambda$: 큰 Weight에 줄 불이익의 강도를 정하는 Hyperparameter
 
 한 방법이 언제나 가장 좋은 것은 아니다. Validation Data로 효과를 확인하며 조합을 선택한다. Test Data는 선택이 끝난 뒤 최종 평가에 사용한다.
 
@@ -589,13 +589,13 @@ Cost(Loss)는 Output과 정답의 차이를 나타낸다. Gradient는 Parameter�
 
 ## 부록: Hidden Layer에서 Sigmoid보다 ReLU를 많이 사용하는 이유
 
-Sigmoid와 ReLU는 모두 \(z\)를 Activation \(a\)로 바꾸는 Activation Function이다.
+Sigmoid와 ReLU는 모두 $z$를 Activation $a$로 바꾸는 Activation Function이다.
 
 $$
 a=f(z)
 $$
 
-Backpropagation에서는 뒤에서 온 Gradient \(\partial C/\partial a\)에 Activation Function의 미분값을 곱한다.
+Backpropagation에서는 뒤에서 온 Gradient $\partial C/\partial a$에 Activation Function의 미분값을 곱한다.
 
 $$
 \frac{\partial C}{\partial z}
@@ -604,9 +604,9 @@ $$
 \frac{\partial a}{\partial z}
 $$
 
-여기서 \(f'(z)=\partial a/\partial z\)이다. 즉 \(z\)가 조금 변할 때 Activation \(a\)가 얼마나 변하는지를 나타낸다.
+여기서 $f'(z)=\partial a/\partial z$이다. 즉 $z$가 조금 변할 때 Activation $a$가 얼마나 변하는지를 나타낸다.
 
-Sigmoid의 미분값은 최대 0.25이다. \(z\)가 매우 크거나 작으면 미분값이 0에 가까워진다. 여러 Hidden Layer에서 작은 값이 반복해서 곱해지면 앞쪽 Layer에 도착하는 Gradient가 매우 작아질 수 있다.
+Sigmoid의 미분값은 최대 0.25이다. $z$가 매우 크거나 작으면 미분값이 0에 가까워진다. 여러 Hidden Layer에서 작은 값이 반복해서 곱해지면 앞쪽 Layer에 도착하는 Gradient가 매우 작아질 수 있다.
 
 $$
 0.8\times0.1\times0.1\times0.1=0.0008
@@ -633,9 +633,9 @@ $$
 
 Positive 영역에서는 미분값이 1이다. 따라서 이 구간에서는 Activation Function 때문에 Gradient가 계속 작아지지 않는다. 계산도 단순하다. 이 두 이유로 깊은 Network의 Hidden Layer에서는 ReLU가 Sigmoid보다 자주 사용된다.
 
-\(z=0\)에서는 수학적인 미분값이 하나로 정해지지 않는다. 실제 구현에서는 보통 0으로 정한다.
+$z=0$에서는 수학적인 미분값이 하나로 정해지지 않는다. 실제 구현에서는 보통 0으로 정한다.
 
-\(\partial C/\partial z\)를 구한 뒤에는 계산이 끝난 것이 아니다. 이 값으로 현재 Layer의 Weight와 Bias Gradient를 구하고, 이전 Layer로 Gradient를 전달한다.
+$\partial C/\partial z$를 구한 뒤에는 계산이 끝난 것이 아니다. 이 값으로 현재 Layer의 Weight와 Bias Gradient를 구하고, 이전 Layer로 Gradient를 전달한다.
 
 $$
 \frac{\partial C}{\partial W}=\frac{\partial C}{\partial z}a_{\text{prev}}^{T},
@@ -645,4 +645,4 @@ $$
 \frac{\partial C}{\partial a_{\text{prev}}}=W^{T}\frac{\partial C}{\partial z}
 $$
 
-ReLU도 한계가 있다. \(z<0\)인 구간에서는 미분값이 0이므로 Neuron이 계속 업데이트되지 않는 Dying ReLU가 생길 수 있다. 또한 Output Layer의 Activation은 문제에 맞춰 선택한다. Binary Classification에는 보통 Sigmoid를, 서로 배타적인 Multi-class Classification에는 Softmax를 사용한다.
+ReLU도 한계가 있다. $z<0$인 구간에서는 미분값이 0이므로 Neuron이 계속 업데이트되지 않는 Dying ReLU가 생길 수 있다. 또한 Output Layer의 Activation은 문제에 맞춰 선택한다. Binary Classification에는 보통 Sigmoid를, 서로 배타적인 Multi-class Classification에는 Softmax를 사용한다.

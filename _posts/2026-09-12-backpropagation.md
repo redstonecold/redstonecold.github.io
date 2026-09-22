@@ -137,7 +137,7 @@ Forward Propagation과 Backpropagation은 같은 계산 경로를 반대 방향�
 
 ![Forward Propagation에서 Backpropagation으로 전환되는 전체 흐름](/assets/img/backpropagation/13-forward-to-backprop.svg){: style="max-width: 100%; height: auto;"}
 
-**그림 읽기.** 위쪽은 왼쪽에서 오른쪽으로 값을 계산한다. Cost를 구한 뒤 방향을 바꾼다. 아래쪽은 오른쪽에서 왼쪽으로 Gradient를 계산한다. \(\partial C/\partial z^{(L)}\)에서 세 갈래로 나뉘는 부분까지가 중요하다.
+**그림 읽기.** 위쪽은 왼쪽에서 오른쪽으로 값을 계산한다. Cost를 구한 뒤 방향을 바꾼다. 아래쪽은 오른쪽에서 왼쪽으로 Gradient를 계산한다. $\partial C/\partial z^{(L)}$에서 세 갈래로 나뉘는 부분까지가 중요하다.
 
 #### 1단계: Forward 값 계산
 
@@ -149,12 +149,12 @@ z^{(L)}=W^{(L)}a^{(L-1)}+b^{(L)},
 a^{(L)}=f\left(z^{(L)}\right)
 $$
 
-- \(a^{(L-1)}\): 이전 Layer의 Activation
-- \(W^{(L)}\), \(b^{(L)}\): 현재 Layer의 Weight와 Bias
-- \(z^{(L)}\): Activation Function을 적용하기 전의 값
-- \(a^{(L)}\): Activation Function을 적용한 현재 Layer의 Activation
+- $a^{(L-1)}$: 이전 Layer의 Activation
+- $W^{(L)}$, $b^{(L)}$: 현재 Layer의 Weight와 Bias
+- $z^{(L)}$: Activation Function을 적용하기 전의 값
+- $a^{(L)}$: Activation Function을 적용한 현재 Layer의 Activation
 
-마지막 Layer의 \(a^{(L)}\)는 Prediction에 사용된다. Prediction과 정답 \(y\)를 비교해 Cost \(C\)를 계산한다. Backpropagation에 필요하므로 Forward에서 계산한 \(a\)와 \(z\)를 저장한다.
+마지막 Layer의 $a^{(L)}$는 Prediction에 사용된다. Prediction과 정답 $y$를 비교해 Cost $C$를 계산한다. Backpropagation에 필요하므로 Forward에서 계산한 $a$와 $z$를 저장한다.
 
 #### 2단계: Cost에서 뒤로 출발
 
@@ -176,7 +176,7 @@ f'\left(z^{(L)}\right)
 \frac{\partial a^{(L)}}{\partial z^{(L)}}
 $$
 
-즉 \(z^{(L)}\)가 조금 변할 때 \(a^{(L)}\)가 얼마나 변하는지 나타낸다. Chain Rule로 두 변화율을 곱한다.
+즉 $z^{(L)}$가 조금 변할 때 $a^{(L)}$가 얼마나 변하는지 나타낸다. Chain Rule로 두 변화율을 곱한다.
 
 $$
 \delta^{(L)}
@@ -188,11 +188,11 @@ $$
 \frac{\partial a^{(L)}}{\partial z^{(L)}}
 $$
 
-\(\odot\)는 같은 위치의 성분끼리 곱한다는 뜻이다. \(\delta^{(L)}\)는 \(\partial C/\partial z^{(L)}\)를 짧게 쓴 기호이다.
+$\odot$는 같은 위치의 성분끼리 곱한다는 뜻이다. $\delta^{(L)}$는 $\partial C/\partial z^{(L)}$를 짧게 쓴 기호이다.
 
 #### 4단계: 세 방향의 Gradient 계산
 
-\(\partial C/\partial z^{(L)}\)에서 계산은 끝나지 않는다. 이 값을 이용해 현재 Layer의 두 Parameter Gradient와 이전 Layer로 보낼 Gradient를 구한다.
+$\partial C/\partial z^{(L)}$에서 계산은 끝나지 않는다. 이 값을 이용해 현재 Layer의 두 Parameter Gradient와 이전 Layer로 보낼 Gradient를 구한다.
 
 $$
 \frac{\partial C}{\partial W^{(L)}}
