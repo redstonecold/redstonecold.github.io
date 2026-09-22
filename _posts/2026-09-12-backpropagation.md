@@ -131,6 +131,91 @@ Cost는 Output이 목표에서 얼마나 벗어났는지 나타낸다. 이 값�
 
 Forward에서는 화살표 방향으로 값을 구한다. Backward에서는 각 연산의 국소 미분을 이용해 Cost의 영향을 거꾸로 전달한다. 한 Node에서 여러 경로로 갈라지면 돌아오는 Gradient를 더한다. 중간 결과를 저장하고 재사용하므로 같은 미분을 반복 계산할 필요가 줄어든다.
 
+### 3.4 Forward Propagation에서 Backpropagation으로
+
+Forward Propagation과 Backpropagation은 같은 계산 경로를 반대 방향으로 읽는다.
+
+![Forward Propagation에서 Backpropagation으로 전환되는 전체 흐름](/assets/img/backpropagation/13-forward-to-backprop.svg){: style="max-width: 100%; height: auto;"}
+
+**그림 읽기.** 위쪽은 왼쪽에서 오른쪽으로 값을 계산한다. Cost를 구한 뒤 방향을 바꾼다. 아래쪽은 오른쪽에서 왼쪽으로 Gradient를 계산한다. \(\partial C/\partial z^{(L)}\)에서 세 갈래로 나뉘는 부분까지가 중요하다.
+
+#### 1단계: Forward 값 계산
+
+현재 Layer의 Forward 계산은 다음과 같다.
+
+$$
+z^{(L)}=W^{(L)}a^{(L-1)}+b^{(L)},
+\qquad
+a^{(L)}=f\left(z^{(L)}\right)
+$$
+
+- \(a^{(L-1)}\): 이전 Layer의 Activation
+- \(W^{(L)}\), \(b^{(L)}\): 현재 Layer의 Weight와 Bias
+- \(z^{(L)}\): Activation Function을 적용하기 전의 값
+- \(a^{(L)}\): Activation Function을 적용한 현재 Layer의 Activation
+
+마지막 Layer의 \(a^{(L)}\)는 Prediction에 사용된다. Prediction과 정답 \(y\)를 비교해 Cost \(C\)를 계산한다. Backpropagation에 필요하므로 Forward에서 계산한 \(a\)와 \(z\)를 저장한다.
+
+#### 2단계: Cost에서 뒤로 출발
+
+먼저 Cost가 현재 Activation에 얼마나 민감한지 계산한다.
+
+$$
+\frac{\partial C}{\partial a^{(L)}}
+$$
+
+이 값은 현재 Layer가 뒤쪽 계산에서 전달받은 Gradient이다. 마지막 Layer에서는 Loss Function을 직접 미분해 구한다. Hidden Layer에서는 뒤쪽 Layer가 계산해 전달한 값을 받는다.
+
+#### 3단계: Activation Function을 거슬러 이동
+
+Activation Function의 미분값은 다음 뜻이다.
+
+$$
+f'\left(z^{(L)}\right)
+=
+\frac{\partial a^{(L)}}{\partial z^{(L)}}
+$$
+
+즉 \(z^{(L)}\)가 조금 변할 때 \(a^{(L)}\)가 얼마나 변하는지 나타낸다. Chain Rule로 두 변화율을 곱한다.
+
+$$
+\delta^{(L)}
+=
+\frac{\partial C}{\partial z^{(L)}}
+=
+\frac{\partial C}{\partial a^{(L)}}
+\odot
+\frac{\partial a^{(L)}}{\partial z^{(L)}}
+$$
+
+\(\odot\)는 같은 위치의 성분끼리 곱한다는 뜻이다. \(\delta^{(L)}\)는 \(\partial C/\partial z^{(L)}\)를 짧게 쓴 기호이다.
+
+#### 4단계: 세 방향의 Gradient 계산
+
+\(\partial C/\partial z^{(L)}\)에서 계산은 끝나지 않는다. 이 값을 이용해 현재 Layer의 두 Parameter Gradient와 이전 Layer로 보낼 Gradient를 구한다.
+
+$$
+\frac{\partial C}{\partial W^{(L)}}
+=
+\delta^{(L)}\left(a^{(L-1)}\right)^T
+$$
+
+$$
+\frac{\partial C}{\partial b^{(L)}}
+=
+\delta^{(L)}
+$$
+
+$$
+\frac{\partial C}{\partial a^{(L-1)}}
+=
+\left(W^{(L)}\right)^T\delta^{(L)}
+$$
+
+첫 번째와 두 번째는 현재 Layer의 Weight와 Bias를 업데이트할 때 사용할 Gradient이다. 세 번째는 이전 Layer로 실제 전달되는 Gradient이다. 이전 Layer에서도 같은 네 단계를 반복한다.
+
+Backpropagation은 모든 Gradient를 계산한다. 그 계산이 끝난 뒤 Gradient Descent가 Weight와 Bias를 업데이트한다. Backward 도중에 Layer 하나씩 즉시 업데이트하는 과정이 아니다.
+
 ## 4. Chain Rule(연쇄법칙): 작은 변화의 경로를 따라가기
 
 우리가 구하려는 값은 다음과 같다.
@@ -163,25 +248,11 @@ $$
 
 ### 4.1 트리로 표현하기
 
-같은 관계를 Tree 구조로 그리면 다음과 같다.
+같은 관계를 Forward 계산과 반대 방향의 Tree 구조로 그리면 다음과 같다. Cost C₀에서 출발해 Output Activation a⁽ᴸ⁾와 z⁽ᴸ⁾를 거친다. 마지막에는 Weight w⁽ᴸ⁾, 이전 Activation a⁽ᴸ⁻¹⁾, Bias b⁽ᴸ⁾ 방향으로 나뉜다.
 
-```
-                    C0
-                    |
-      dC0/da(L) = 2(a(L) - y)
-                    |
-                   a(L)
-                    |
-      da(L)/dz(L) = sigma'(z(L))
-                    |
-                   z(L)
-                    |
-              dz(L)/dw(L) = a(L-1)
-                    |
-                  w(L)
-```
+![Cost에서 Parameter 방향으로 내려가는 Backpropagation Tree](/assets/img/backpropagation/12-backprop-tree.svg){: style="max-width: 100%; height: auto;"}
 
-∂C₀/∂w⁽ᴸ⁾을 구하려면 C₀에서 w⁽ᴸ⁾까지 내려가는 경로를 따라가며, 그 경로에 있는 변화율을 전부 곱한다. Node가 여러 갈래로 나뉘는 경우(하나의 Activation이 여러 Neuron과 연결된 경우)에는 각 경로의 곱을 구한 뒤 더한다. “한 경로의 변화율은 곱하고, 여러 경로의 영향은 더한다”는 9절의 기준이 이 Tree 구조에서 그대로 나온다.
+**그림 읽기.** 참고한 Forward Tree를 거꾸로 읽는 구조이다. C₀에서 w⁽ᴸ⁾까지 한 경로를 따라갈 때는 각 구간의 변화율을 곱한다. a⁽ᴸ⁻¹⁾ 방향으로 전달된 Gradient는 앞쪽 Layer의 계산으로 계속 이어진다. y는 정답이므로 업데이트하지 않는다. Node가 여러 경로로 나뉘면 각 경로에서 돌아오는 Gradient를 더한다.
 
 ## 5. 세 구간을 직접 미분하기
 
@@ -267,6 +338,12 @@ Bias는 z에 그대로 더해진다. 따라서 Bias에 대한 z의 미분은 1�
 
 즉, Weight Gradient에 있던 “이전 Activation” 대신 1이 곱해진다. 별도의 원리를 새로 배울 필요는 없다. Chain Rule에서 첫 구간만 달라진다.
 
+$$
+\frac{\partial C_0}{\partial b^{(L)}}
+=
+\frac{\partial C_0}{\partial z^{(L)}}
+$$
+
 ### 6.2 이전 Activation에 대한 미분
 
 이전 Activation은 z에서 Weight와 곱해진다. 따라서 이전 Activation에 대한 z의 미분은 Weight이다.
@@ -274,6 +351,14 @@ Bias는 z에 그대로 더해진다. 따라서 Bias에 대한 z의 미분은 1�
 이 Weight의 부호가 앞쪽으로 전달할 방향에 영향을 준다. 양의 연결과 음의 연결에서 필요한 Activation 변화가 다른 이유이다.
 
 이전 Activation의 Gradient를 구했다면, 그 Activation을 만든 앞쪽 Weight와 Bias로 계산을 이어 갈 수 있다. Backpropagation은 이렇게 이미 구한 결과를 재사용한다.
+
+$$
+\frac{\partial C_0}{\partial a^{(L-1)}}
+=
+w^{(L)}\frac{\partial C_0}{\partial z^{(L)}}
+$$
+
+이 값이 앞쪽 Layer가 뒤에서 전달받는 Gradient이다. 앞쪽 Layer에서도 Activation Function의 미분값을 곱하고, 그 Layer의 Weight와 Bias Gradient를 구한다.
 
 ![미분 대상에 따른 첫 구간의 차이](/assets/img/backpropagation/06-bias-input.svg){: style="max-width: 100%; height: auto;"}
 

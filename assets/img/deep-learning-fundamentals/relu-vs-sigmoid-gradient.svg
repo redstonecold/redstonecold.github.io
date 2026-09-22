@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="520" viewBox="0 0 1080 520" role="img" aria-labelledby="title desc">
+  <title id="title">Sigmoid와 ReLU의 Gradient 전달 비교</title>
+  <desc id="desc">Sigmoid에서는 작은 미분값이 반복해서 곱해져 Gradient가 작아지고, ReLU의 양수 구간에서는 미분값 1이 곱해져 Gradient가 유지되는 예시</desc>
+  <defs>
+    <marker id="blueArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#087f8c"/>
+    </marker>
+    <marker id="orangeArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d66b25"/>
+    </marker>
+  </defs>
+  <rect width="1080" height="520" rx="28" fill="#f6f9fc"/>
+  <text x="50" y="56" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="28" font-weight="700" fill="#17324d">Activation Function의 미분값이 Gradient에 반복해서 곱해진다</text>
+
+  <rect x="42" y="88" width="996" height="172" rx="20" fill="#fff2e8"/>
+  <text x="68" y="124" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="22" font-weight="700" fill="#d66b25">Sigmoid · 포화 구간의 미분값을 0.1이라고 가정</text>
+  <g font-family="Arial, 'Apple SD Gothic Neo', sans-serif" text-anchor="middle">
+    <g fill="#ffffff" stroke="#efb184" stroke-width="2">
+      <rect x="76" y="154" width="150" height="70" rx="14"/>
+      <rect x="330" y="154" width="150" height="70" rx="14"/>
+      <rect x="584" y="154" width="150" height="70" rx="14"/>
+      <rect x="838" y="154" width="150" height="70" rx="14"/>
+    </g>
+    <g font-size="23" font-weight="700" fill="#17324d">
+      <text x="151" y="197">0.8</text>
+      <text x="405" y="197">0.08</text>
+      <text x="659" y="197">0.008</text>
+      <text x="913" y="197">0.0008</text>
+    </g>
+    <g font-size="17" fill="#9b4c1c">
+      <text x="278" y="179">× 0.1</text>
+      <text x="532" y="179">× 0.1</text>
+      <text x="786" y="179">× 0.1</text>
+    </g>
+  </g>
+  <g stroke="#d66b25" stroke-width="4" fill="none" marker-end="url(#orangeArrow)">
+    <path d="M226 199 H318"/>
+    <path d="M480 199 H572"/>
+    <path d="M734 199 H826"/>
+  </g>
+
+  <rect x="42" y="284" width="996" height="172" rx="20" fill="#eaf7f8"/>
+  <text x="68" y="320" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="22" font-weight="700" fill="#087f8c">ReLU · z &gt; 0인 구간의 미분값은 1</text>
+  <g font-family="Arial, 'Apple SD Gothic Neo', sans-serif" text-anchor="middle">
+    <g fill="#ffffff" stroke="#92cdd2" stroke-width="2">
+      <rect x="76" y="350" width="150" height="70" rx="14"/>
+      <rect x="330" y="350" width="150" height="70" rx="14"/>
+      <rect x="584" y="350" width="150" height="70" rx="14"/>
+      <rect x="838" y="350" width="150" height="70" rx="14"/>
+    </g>
+    <g font-size="23" font-weight="700" fill="#17324d">
+      <text x="151" y="393">0.8</text>
+      <text x="405" y="393">0.8</text>
+      <text x="659" y="393">0.8</text>
+      <text x="913" y="393">0.8</text>
+    </g>
+    <g font-size="17" fill="#087f8c">
+      <text x="278" y="375">× 1</text>
+      <text x="532" y="375">× 1</text>
+      <text x="786" y="375">× 1</text>
+    </g>
+  </g>
+  <g stroke="#087f8c" stroke-width="4" fill="none" marker-end="url(#blueArrow)">
+    <path d="M226 395 H318"/>
+    <path d="M480 395 H572"/>
+    <path d="M734 395 H826"/>
+  </g>
+  <text x="540" y="493" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" text-anchor="middle" font-size="17" fill="#526a7d">ReLU도 z &lt; 0에서는 미분값이 0이므로 Gradient가 막힐 수 있다.</text>
+</svg>

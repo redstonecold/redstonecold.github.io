@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" role="img" aria-labelledby="title desc">
+  <title id="title">Forward Propagation에서 Backpropagation으로 전환되는 과정</title>
+  <desc id="desc">Forward에서 이전 Activation과 Parameter로 z, Activation, Cost를 계산하고, Backward에서 Cost의 Gradient가 Activation과 z를 거쳐 Weight, Bias, 이전 Activation의 Gradient로 갈라지는 흐름</desc>
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#087f8c"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d66b25"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#17324d" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="1120" height="760" rx="28" fill="#f6f9fc"/>
+  <text x="56" y="54" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="25" font-weight="700" fill="#17324d">Forward에서 값을 구하고, Backward에서 Gradient를 구한다</text>
+
+  <rect x="44" y="82" width="1032" height="232" rx="22" fill="#eaf7f8"/>
+  <text x="70" y="120" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="22" font-weight="700" fill="#087f8c">FORWARD PROPAGATION · 왼쪽 → 오른쪽</text>
+
+  <g filter="url(#shadow)" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" text-anchor="middle">
+    <rect x="72" y="150" width="220" height="112" rx="16" fill="#ffffff" stroke="#98cfd3" stroke-width="2"/>
+    <text x="182" y="187" font-size="18" font-weight="700" fill="#17324d">이전 Activation과 Parameter</text>
+    <text x="182" y="224" font-size="21" fill="#087f8c">a⁽ᴸ⁻¹⁾, W⁽ᴸ⁾, b⁽ᴸ⁾</text>
+
+    <rect x="338" y="150" width="210" height="112" rx="16" fill="#ffffff" stroke="#98cfd3" stroke-width="2"/>
+    <text x="443" y="187" font-size="18" font-weight="700" fill="#17324d">Linear 계산</text>
+    <text x="443" y="224" font-size="21" fill="#087f8c">z = Wa + b</text>
+
+    <rect x="594" y="150" width="196" height="112" rx="16" fill="#ffffff" stroke="#98cfd3" stroke-width="2"/>
+    <text x="692" y="187" font-size="18" font-weight="700" fill="#17324d">Activation</text>
+    <text x="692" y="224" font-size="21" fill="#087f8c">a = f(z)</text>
+
+    <rect x="836" y="150" width="210" height="112" rx="16" fill="#ffffff" stroke="#98cfd3" stroke-width="2"/>
+    <text x="941" y="187" font-size="18" font-weight="700" fill="#17324d">Prediction과 정답</text>
+    <text x="941" y="224" font-size="21" fill="#087f8c">Cost C 계산</text>
+  </g>
+
+  <g stroke="#087f8c" stroke-width="4" fill="none" marker-end="url(#arrowBlue)">
+    <path d="M292 206 H330"/>
+    <path d="M548 206 H586"/>
+    <path d="M790 206 H828"/>
+  </g>
+
+  <path d="M942 276 C942 330 1014 330 1014 379 C1014 418 972 426 930 426" fill="none" stroke="#7b8fa3" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#arrowOrange)"/>
+  <rect x="414" y="326" width="292" height="56" rx="28" fill="#17324d"/>
+  <text x="560" y="361" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="20" font-weight="700" text-anchor="middle" fill="#ffffff">Cost 계산 완료 · 방향 전환</text>
+
+  <rect x="44" y="398" width="1032" height="316" rx="22" fill="#fff3e9"/>
+  <text x="70" y="438" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="22" font-weight="700" fill="#d66b25">BACKPROPAGATION · 오른쪽 → 왼쪽</text>
+
+  <g filter="url(#shadow)" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" text-anchor="middle">
+    <rect x="808" y="466" width="238" height="92" rx="16" fill="#ffffff" stroke="#efb184" stroke-width="2"/>
+    <text x="927" y="501" font-size="18" font-weight="700" fill="#17324d">뒤에서 온 Gradient</text>
+    <text x="927" y="534" font-size="22" fill="#d66b25">∂C / ∂a⁽ᴸ⁾</text>
+
+    <rect x="500" y="466" width="258" height="92" rx="16" fill="#ffffff" stroke="#efb184" stroke-width="2"/>
+    <text x="629" y="499" font-size="18" font-weight="700" fill="#17324d">Activation 미분을 곱함</text>
+    <text x="629" y="532" font-size="20" fill="#d66b25">∂a / ∂z = f′(z)</text>
+
+    <rect x="176" y="466" width="274" height="92" rx="16" fill="#ffffff" stroke="#efb184" stroke-width="2"/>
+    <text x="313" y="499" font-size="18" font-weight="700" fill="#17324d">현재 z의 Gradient</text>
+    <text x="313" y="532" font-size="22" fill="#d66b25">δ⁽ᴸ⁾ = ∂C / ∂z⁽ᴸ⁾</text>
+  </g>
+
+  <g stroke="#d66b25" stroke-width="4" fill="none" marker-end="url(#arrowOrange)">
+    <path d="M808 512 H766"/>
+    <path d="M500 512 H458"/>
+  </g>
+
+  <text x="783" y="492" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="16" font-weight="700" text-anchor="middle" fill="#9b4c1c">×</text>
+
+  <path d="M313 558 V588" fill="none" stroke="#d66b25" stroke-width="4"/>
+  <circle cx="313" cy="588" r="7" fill="#d66b25"/>
+  <g stroke="#d66b25" stroke-width="3" fill="none" marker-end="url(#arrowOrange)">
+    <path d="M313 588 C313 616 171 606 171 634"/>
+    <path d="M313 588 V634"/>
+    <path d="M313 588 C313 616 520 606 520 634"/>
+  </g>
+
+  <g font-family="Arial, 'Apple SD Gothic Neo', sans-serif" text-anchor="middle">
+    <rect x="72" y="635" width="198" height="58" rx="13" fill="#ffffff" stroke="#efb184" stroke-width="2"/>
+    <text x="171" y="660" font-size="17" font-weight="700" fill="#17324d">Weight Gradient</text>
+    <text x="171" y="683" font-size="17" fill="#d66b25">∂C/∂W = δaᵀ</text>
+
+    <rect x="286" y="635" width="154" height="58" rx="13" fill="#ffffff" stroke="#efb184" stroke-width="2"/>
+    <text x="363" y="660" font-size="17" font-weight="700" fill="#17324d">Bias Gradient</text>
+    <text x="363" y="683" font-size="17" fill="#d66b25">∂C/∂b = δ</text>
+
+    <rect x="456" y="635" width="250" height="58" rx="13" fill="#ffffff" stroke="#efb184" stroke-width="2"/>
+    <text x="581" y="660" font-size="17" font-weight="700" fill="#17324d">이전 Layer로 전달</text>
+    <text x="581" y="683" font-size="17" fill="#d66b25">∂C/∂a_prev = Wᵀδ</text>
+  </g>
+
+  <path d="M706 664 H874" fill="none" stroke="#d66b25" stroke-width="3" stroke-dasharray="8 7" marker-end="url(#arrowOrange)"/>
+  <text x="884" y="656" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="17" font-weight="700" fill="#17324d">앞쪽 Hidden Layer에서</text>
+  <text x="884" y="680" font-family="Arial, 'Apple SD Gothic Neo', sans-serif" font-size="17" fill="#17324d">같은 계산을 반복</text>
+</svg>

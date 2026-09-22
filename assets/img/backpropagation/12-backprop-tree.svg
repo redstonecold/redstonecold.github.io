@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="820" viewBox="0 0 960 820" role="img" aria-labelledby="title desc">
+  <title id="title">Backpropagation Tree: Cost에서 Parameter 방향으로</title>
+  <desc id="desc">Cost C0에서 출발한 Gradient가 Output Activation, z를 거쳐 Weight, 이전 Activation, Bias 방향으로 전달되는 역방향 계산 Tree</desc>
+  <defs>
+    <marker id="arrow-orange" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9Z" fill="#ff765f" />
+    </marker>
+    <marker id="arrow-teal" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9Z" fill="#69d6d0" />
+    </marker>
+    <marker id="arrow-gray" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9Z" fill="#8d99a8" />
+    </marker>
+  </defs>
+
+  <rect width="960" height="820" rx="24" fill="#10151d" />
+
+  <g font-family="Arial, Apple SD Gothic Neo, sans-serif">
+    <text x="48" y="55" font-size="27" font-weight="700" fill="#f4f7fa">Backpropagation Tree</text>
+    <text x="48" y="86" font-size="17" fill="#aeb9c5">Cost에서 출발해 계산 경로를 거꾸로 따라간다</text>
+
+    <!-- Cost -->
+    <circle cx="480" cy="145" r="48" fill="#281d20" stroke="#ff765f" stroke-width="3" />
+    <text x="480" y="154" font-size="34" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#ff765f">C₀</text>
+    <text x="480" y="210" font-size="16" text-anchor="middle" fill="#ffad9e">Cost</text>
+
+    <!-- Cost branches -->
+    <path d="M458 190 C430 225 410 245 390 280" fill="none" stroke="#ff765f" stroke-width="3" marker-end="url(#arrow-orange)" />
+    <text x="330" y="235" font-size="17" text-anchor="middle" fill="#ffad9e">∂C₀ / ∂a⁽ᴸ⁾</text>
+    <path d="M518 184 C575 215 640 245 690 280" fill="none" stroke="#8d99a8" stroke-width="2.5" stroke-dasharray="8 7" marker-end="url(#arrow-gray)" />
+    <text x="667" y="235" font-size="16" text-anchor="middle" fill="#aeb9c5">정답은 고정</text>
+
+    <!-- Output activation and target -->
+    <circle cx="370" cy="325" r="48" fill="#16262a" stroke="#69d6d0" stroke-width="3" />
+    <text x="370" y="335" font-size="34" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#69d6d0">a⁽ᴸ⁾</text>
+    <text x="370" y="390" font-size="16" text-anchor="middle" fill="#9ce7e3">Output Activation</text>
+
+    <circle cx="710" cy="325" r="42" fill="#202731" stroke="#8d99a8" stroke-width="2.5" />
+    <text x="710" y="335" font-size="34" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#d0d6dd">y</text>
+    <text x="710" y="382" font-size="16" text-anchor="middle" fill="#aeb9c5">Target</text>
+
+    <!-- Activation to z -->
+    <path d="M370 374 L370 458" fill="none" stroke="#69d6d0" stroke-width="3" marker-end="url(#arrow-teal)" />
+    <text x="490" y="424" font-size="17" text-anchor="middle" fill="#9ce7e3">∂a⁽ᴸ⁾ / ∂z⁽ᴸ⁾</text>
+
+    <!-- z -->
+    <circle cx="370" cy="510" r="48" fill="#1c251d" stroke="#9bcf70" stroke-width="3" />
+    <text x="370" y="521" font-size="34" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#9bcf70">z⁽ᴸ⁾</text>
+    <!-- z branches -->
+    <path d="M338 548 C305 585 260 610 220 650" fill="none" stroke="#69d6d0" stroke-width="3" marker-end="url(#arrow-teal)" />
+    <path d="M370 558 L370 650" fill="none" stroke="#69d6d0" stroke-width="3" marker-end="url(#arrow-teal)" />
+    <path d="M402 548 C455 585 530 615 600 650" fill="none" stroke="#69d6d0" stroke-width="3" marker-end="url(#arrow-teal)" />
+
+    <text x="218" y="610" font-size="15" text-anchor="middle" fill="#9ce7e3">∂z⁽ᴸ⁾ / ∂w⁽ᴸ⁾</text>
+    <text x="370" y="625" font-size="15" text-anchor="middle" fill="#9ce7e3">∂z⁽ᴸ⁾ / ∂a⁽ᴸ⁻¹⁾</text>
+    <text x="607" y="610" font-size="15" text-anchor="middle" fill="#9ce7e3">∂z⁽ᴸ⁾ / ∂b⁽ᴸ⁾</text>
+
+    <!-- Leaves -->
+    <rect x="125" y="665" width="190" height="92" rx="16" fill="#172129" stroke="#54bce8" stroke-width="2.5" />
+    <text x="220" y="706" font-size="31" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#54bce8">w⁽ᴸ⁾</text>
+    <text x="220" y="737" font-size="16" text-anchor="middle" fill="#a9dff5">Weight · 업데이트</text>
+
+    <rect x="330" y="665" width="210" height="92" rx="16" fill="#20242c" stroke="#f2f4f7" stroke-width="2.5" />
+    <text x="435" y="706" font-size="31" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#f2f4f7">a⁽ᴸ⁻¹⁾</text>
+    <text x="435" y="737" font-size="16" text-anchor="middle" fill="#c8d0d9">앞 Layer로 계속</text>
+
+    <rect x="555" y="665" width="190" height="92" rx="16" fill="#291e27" stroke="#e89bc3" stroke-width="2.5" />
+    <text x="650" y="706" font-size="31" font-family="Georgia, serif" font-style="italic" text-anchor="middle" fill="#e89bc3">b⁽ᴸ⁾</text>
+    <text x="650" y="737" font-size="16" text-anchor="middle" fill="#f1bfd9">Bias · 업데이트</text>
+
+    <text x="480" y="795" font-size="17" text-anchor="middle" fill="#aeb9c5">한 경로의 변화율은 곱하고, 여러 경로에서 돌아오는 Gradient는 더한다.</text>
+  </g>
+</svg>
