@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360" role="img" aria-label="Computer Vision 전체 흐름">
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0v6l9-3z" fill="#14818c"/></marker></defs>
+<rect width="1100" height="360" rx="28" fill="#f5f8fb"/><text x="50" y="56" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#17324d">Deep Learning for Computer Vision</text>
+<g font-family="Arial,sans-serif" text-anchor="middle"><g fill="#fff" stroke="#86c9ce" stroke-width="3"><rect x="48" y="112" width="200" height="118" rx="18"/><rect x="318" y="112" width="200" height="118" rx="18"/><rect x="588" y="112" width="200" height="118" rx="18"/><rect x="858" y="112" width="194" height="118" rx="18"/></g>
+<g fill="#17324d" font-weight="700" font-size="21"><text x="148" y="153">Image</text><text x="418" y="153">Tensor</text><text x="688" y="153">Feature Learning</text><text x="955" y="153">Vision Task</text></g>
+<g fill="#527083" font-size="17"><text x="148" y="190">Pixel · RGB/BGR</text><text x="148" y="214">Resize · Normalize</text><text x="418" y="190">(N, H, W, C)</text><text x="418" y="214">Batch</text><text x="688" y="190">CNN · Training</text><text x="688" y="214">Transfer Learning</text><text x="955" y="190">Classification</text><text x="955" y="214">Detection · Segmentation</text></g></g>
+<g stroke="#14818c" stroke-width="4" marker-end="url(#a)"><path d="M248 171h58"/><path d="M518 171h58"/><path d="M788 171h58"/></g>
+<text x="550" y="302" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#17324d">숫자로 표현 → Feature 학습 → 목적에 맞는 Prediction</text>
+</svg>

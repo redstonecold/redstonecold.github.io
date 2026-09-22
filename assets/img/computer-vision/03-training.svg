@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="450" viewBox="0 0 1100 450" role="img" aria-label="Training과 Validation Loss 곡선">
+<rect width="1100" height="450" rx="28" fill="#f7f9fc"/><text x="48" y="54" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#17324d">Training Loss와 Validation Loss</text>
+<g stroke="#7b8fa3" stroke-width="3"><path d="M105 360V100"/><path d="M105 360H1005"/></g><text x="30" y="220" transform="rotate(-90 30 220)" font-family="Arial,sans-serif" font-size="19" fill="#526a7d">Loss</text><text x="535" y="410" font-family="Arial,sans-serif" font-size="19" fill="#526a7d">Epoch</text>
+<path d="M120 125 C260 175 360 235 500 278 S760 328 980 346" fill="none" stroke="#158591" stroke-width="6"/><path d="M120 140 C260 188 380 250 520 280 S700 270 780 235 S900 174 980 140" fill="none" stroke="#d66b25" stroke-width="6"/>
+<path d="M665 95V360" stroke="#9d6db0" stroke-width="3" stroke-dasharray="9 8"/><text x="682" y="120" font-family="Arial,sans-serif" font-size="18" fill="#77468b">Overfitting 시작 가능 구간</text>
+<g font-family="Arial,sans-serif" font-size="18"><line x1="725" y1="390" x2="770" y2="390" stroke="#158591" stroke-width="6"/><text x="780" y="396" fill="#17324d">Training Loss</text><line x1="885" y1="390" x2="930" y2="390" stroke="#d66b25" stroke-width="6"/><text x="940" y="396" fill="#17324d">Validation Loss</text></g>
+</svg>
