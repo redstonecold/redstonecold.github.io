@@ -1,0 +1,462 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Computer Vision 발표: Pixel에서 U-Net까지 | Seokchan Hong </title> <meta name="author" content="Seokchan Hong"> <meta name="description" content="Pixel과 Image Shape부터 CNN의 Feature 학습, Generalization, Segmentation Mask, U-Net까지 발표 흐름에 맞춰 정리한다."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=3116ba77db9ee1581d05bb3e86fbf7f1"> <link rel="canonical" href="https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet/"> <script src="/assets/js/theme.js?v=5286c3e4c334d0ecb8fc0c40ff4fa7ec"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Seokchan</span> Hong </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Computer Vision 발표: Pixel에서 U-Net까지</h1> <p class="post-meta"> Created on September 29, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/ai"> <i class="fa-solid fa-hashtag fa-sm"></i> ai</a>   <a href="/blog/tag/deep-learning"> <i class="fa-solid fa-hashtag fa-sm"></i> deep-learning</a>   <a href="/blog/tag/computer-vision"> <i class="fa-solid fa-hashtag fa-sm"></i> computer-vision</a>   <a href="/blog/tag/cnn"> <i class="fa-solid fa-hashtag fa-sm"></i> cnn</a>   <a href="/blog/tag/segmentation"> <i class="fa-solid fa-hashtag fa-sm"></i> segmentation</a>   <a href="/blog/tag/study"> <i class="fa-solid fa-hashtag fa-sm"></i> study</a>   ·   <a href="/blog/category/ai-deeplearning"> <i class="fa-solid fa-tag fa-sm"></i> AI/DeepLearning</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <style>
+article h2 { margin-top: 3.5rem; }
+article h3 { margin-top: 2.3rem; }
+article img { max-width: 100%; height: auto; }
+</style> <blockquote> <p>Image를 숫자 배열로 표현 → CNN으로 Feature 추출 → Validation으로 Generalization 확인 → U-Net으로 Pixel Mask 생성</p> </blockquote> <h2 id="발표-흐름">발표 흐름</h2> <ol> <li>Pixel, Image Shape, Height × Width × Channels</li> <li>Image Loading, Resizing, Normalization</li> <li>Convolution, Kernel / Filter, Feature Map</li> <li>Local Receptive Field, Weight Sharing</li> <li>Overfitting and Generalization</li> <li>Pixel-wise Prediction and Segmentation Mask</li> <li>U-Net · Encoder, Decoder, Skip Connection</li> </ol> <p><img src="/assets/img/computer-vision/07-presentation-flow.svg" alt="발표 전체 흐름"></p> <p><strong>그림 읽기:</strong> Image의 숫자 표현에서 시작해 전처리, CNN, Generalization, Segmentation으로 이어지는 발표 순서.</p> <h2 id="1-pixel-image-shape-height--width--channels">1. Pixel, Image Shape, Height × Width × Channels</h2> <p><strong>Tensor(텐서):</strong> 숫자를 여러 차원으로 배열한 자료 구조. 여기서는 Image Pixel을 <code class="language-plaintext highlighter-rouge">(Height, Width, Channels)</code> 형태로 저장한 숫자 배열이라는 의미만 사용.</p> <p><strong>Axis(축):</strong> Shape에 적힌 각 위치의 번호. 이 글에서 사용하는 HWC 순서에서는 Axis 0이 Height, Axis 1이 Width, Axis 2가 Channels.</p> <table> <thead> <tr> <th>차원</th> <th>이름</th> <th>형태</th> <th>Image에서의 예</th> </tr> </thead> <tbody> <tr> <td>0차원</td> <td>Scalar(스칼라)</td> <td>숫자 하나</td> <td>Pixel의 Channel 값 하나</td> </tr> <tr> <td>1차원</td> <td>Vector(벡터)</td> <td>숫자가 한 방향으로 배열</td> <td>RGB Pixel <code class="language-plaintext highlighter-rouge">[R, G, B]</code> </td> </tr> <tr> <td>2차원</td> <td>Matrix(행렬)</td> <td>행과 열로 배열</td> <td>Grayscale Image <code class="language-plaintext highlighter-rouge">(H, W)</code> </td> </tr> <tr> <td>3차원</td> <td>3D Tensor(3차원 텐서)</td> <td>행 × 열 × Channel</td> <td>Color Image <code class="language-plaintext highlighter-rouge">(H, W, C)</code> </td> </tr> <tr> <td>4차원</td> <td>4D Tensor(4차원 텐서)</td> <td>여러 3D Tensor의 묶음</td> <td>Image Batch <code class="language-plaintext highlighter-rouge">(N, H, W, C)</code> </td> </tr> </tbody> </table> <blockquote> <p>이 표에서는 숫자가 배열된 방향의 수를 Tensor의 차원이라고 부름. 발표의 핵심은 3차원 Color Image Shape인 <code class="language-plaintext highlighter-rouge">(H, W, C)</code>.</p> </blockquote> <p><strong>Pixel:</strong> Digital Image를 구성하는 최소 단위</p> <p><strong>Image:</strong> Pixel을 Height와 Width 방향으로 배열한 숫자 Tensor</p> <p>Model이 보는 것은 고양이, 사람, 자동차라는 의미가 아니라 각 Pixel에 저장된 숫자.</p> <h3 id="pixel-값">Pixel 값</h3> <p><strong>Grayscale Pixel:</strong> 밝기값 하나</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0   : 검은색
+128 : 중간 회색
+255 : 흰색
+</code></pre></div></div> <p><strong>RGB Pixel:</strong> 색상 강도 세 개</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Pixel = [Red, Green, Blue]
+</code></pre></div></div> <h3 id="8-bit-image">8-bit Image</h3> <p><strong>8-bit Image:</strong> Pixel의 값 하나를 8개의 bit로 표현하는 Image</p> <p>Grayscale Image에서는 Pixel 하나의 밝기를 8-bit로 표현.</p> <p>RGB Image에서는 Pixel 하나가 가진 Red, Green, Blue의 색상 강도를 각각 8-bit로 표현.</p> \[2^8=256\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2의 8제곱 = 256
+</code></pre></div></div> <p>가능한 값의 개수는 256개. 0부터 시작하므로 실제 범위는 0–255.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>00000000 = 0
+11111111 = 255
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Grayscale Pixel = 밝기값 1개 = 8-bit
+RGB Pixel       = [R, G, B]  = 8-bit + 8-bit + 8-bit = 24-bit
+</code></pre></div></div> <p>RGB Pixel의 예:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[255,   0,   0] → Red
+[  0, 255,   0] → Green
+[  0,   0, 255] → Blue
+[255, 255, 255] → White
+[  0,   0,   0] → Black
+</code></pre></div></div> <h3 id="image-shape">Image Shape</h3> <p><strong>Image Shape:</strong> Tensor의 각 Dimension 크기</p> \[(\text{Height},\text{Width},\text{Channels})\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Image Shape = (Height, Width, Channels)
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(480, 640, 3)
+  ↑    ↑    └─ Pixel마다 저장된 값 3개
+  │    └────── 가로 640 Pixel
+  └─────────── 세로 480 Pixel
+</code></pre></div></div> <table> <thead> <tr> <th>Dimension</th> <th>핵심 의미</th> </tr> </thead> <tbody> <tr> <td>Height</td> <td>세로 방향 Pixel 수</td> </tr> <tr> <td>Width</td> <td>가로 방향 Pixel 수</td> </tr> <tr> <td>Channels</td> <td>같은 공간 위치에 저장하는 정보 성분의 수</td> </tr> </tbody> </table> <p><strong>Channel:</strong> Image를 구성하는 정보 성분 하나</p> <p>각 Channel은 <code class="language-plaintext highlighter-rouge">Height × Width</code> 크기의 2차원 값 배열. 여러 Channel을 같은 위치에 겹쳐 하나의 Image를 표현.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Grayscale: 밝기 Channel 1개
+RGB:       Red, Green, Blue Channel 3개
+BGR:       Blue, Green, Red Channel 3개
+</code></pre></div></div> <p>RGB Image의 한 좌표에는 각 Channel에서 값 하나씩 대응하므로 <code class="language-plaintext highlighter-rouge">[R, G, B]</code> 세 값이 존재.</p> <blockquote> <p>CNN의 중간 Feature Map에서 Channel은 색상이 아니라 서로 다른 Feature를 나타냄.</p> </blockquote> <h3 id="rgb와-bgr">RGB와 BGR</h3> <p><strong>RGB:</strong> Red, Green, Blue 순서</p> <p><strong>BGR:</strong> Blue, Green, Red 순서</p> <p>OpenCV의 기본 Color Image 순서는 BGR. RGB 기반 화면이나 Library에 전달할 때 Channel 순서 변환 필요.</p> <p><img src="/assets/img/computer-vision/08-image-shape.svg" alt="Pixel과 Image Shape"></p> <p><strong>그림 읽기:</strong> RGB Pixel의 세 값이 Channel Dimension을 형성. Image Shape의 마지막 3이 Red, Green, Blue에 대응.</p> <h2 id="2-image-loading-resizing-normalization">2. Image Loading, Resizing, Normalization</h2> <p><strong>Image 전처리:</strong> 원본 Image를 Model이 받을 수 있는 Shape과 값의 범위로 변환하는 과정</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Image Loading
+→ Color Conversion
+→ Resizing
+→ Data Type 변환
+→ Normalization
+</code></pre></div></div> <p><img src="/assets/img/computer-vision/12-preprocessing-pipeline.svg" alt="Image 전처리 단계와 Shape 변화"></p> <p><strong>그림 읽기:</strong> Image를 읽은 뒤 Color 순서와 크기를 맞추고, Pixel 값을 Model이 계산하기 좋은 범위로 변환.</p> <h3 id="도구별-역할">도구별 역할</h3> <table> <thead> <tr> <th>도구</th> <th>핵심 역할</th> </tr> </thead> <tbody> <tr> <td>OpenCV</td> <td>Image Loading, Resizing, 색상 변환</td> </tr> <tr> <td>NumPy</td> <td>Pixel을 Array로 저장하고 수치 계산</td> </tr> <tr> <td>TensorFlow</td> <td>Tensor 연산, 자동 미분, Training</td> </tr> <tr> <td>Keras</td> <td>Layer와 Model 구성을 위한 High-level API</td> </tr> </tbody> </table> <p><strong><code class="language-plaintext highlighter-rouge">cv2</code>:</strong> Python에서 OpenCV 기능을 제공하는 Module</p> <p><code class="language-plaintext highlighter-rouge">cv2</code> 자체가 Image 객체인 것은 아님. <code class="language-plaintext highlighter-rouge">cv2.imread()</code>, <code class="language-plaintext highlighter-rouge">cv2.resize()</code> 같은 Function의 모음.</p> <p><strong>NumPy:</strong> 다차원 Array와 수치 계산을 제공하는 Library</p> <p>OpenCV로 읽은 Image의 일반적인 Type은 NumPy의 <code class="language-plaintext highlighter-rouge">ndarray</code>.</p> <h3 id="image-loading">Image Loading</h3> <p><strong><code class="language-plaintext highlighter-rouge">cv2.imread()</code>:</strong> 파일 경로에서 Image를 읽는 Function</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">cv2</span>
+
+<span class="n">image_bgr</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="sh">"</span><span class="s">cat.jpg</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">print</span><span class="p">(</span><span class="nf">type</span><span class="p">(</span><span class="n">image_bgr</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">image_bgr</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">image_bgr</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'numpy.ndarray'&gt;
+(480, 640, 3)
+uint8
+</code></pre></div></div> <p><strong><code class="language-plaintext highlighter-rouge">uint8</code>:</strong> 0–255를 저장하는 부호 없는 8-bit 정수 Type</p> <h3 id="color-conversion">Color Conversion</h3> <p><strong><code class="language-plaintext highlighter-rouge">cv2.cvtColor()</code>:</strong> Image의 색상 표현을 변환하는 Function</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">image_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">cvtColor</span><span class="p">(</span>
+    <span class="n">image_bgr</span><span class="p">,</span>
+    <span class="n">cv2</span><span class="p">.</span><span class="n">COLOR_BGR2RGB</span>
+<span class="p">)</span>
+</code></pre></div></div> <p>Channel 수는 3개로 유지. BGR에서 RGB로 순서만 변경.</p> <h3 id="resizing">Resizing</h3> <p><strong><code class="language-plaintext highlighter-rouge">cv2.resize()</code>:</strong> Image의 Width와 Height를 바꾸는 Function</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">resized</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">resize</span><span class="p">(</span><span class="n">image_rgb</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+</code></pre></div></div> <p>주의할 순서:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cv2.resize Argument: (Width, Height)
+Image Shape:          (Height, Width, Channels)
+</code></pre></div></div> <p>Model은 정해진 Input Shape을 사용하므로 크기가 다른 Image를 같은 크기로 통일.</p> <h3 id="data-type-변환">Data Type 변환</h3> <p><strong><code class="language-plaintext highlighter-rouge">.astype()</code>:</strong> NumPy Array의 Data Type을 변환하는 Method</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">float_image</span> <span class="o">=</span> <span class="n">resized</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div> <p><code class="language-plaintext highlighter-rouge">uint8</code>에서 <code class="language-plaintext highlighter-rouge">float32</code>로 변환 → 소수 계산 가능. TensorFlow Image 계산에 흔히 사용하는 Type.</p> <h3 id="normalization">Normalization</h3> <p><strong>Normalization:</strong> Pixel 값을 일정한 범위로 변환하는 과정</p> <p>0–255 값을 0–1로 바꾸는 기본식:</p> \[x_{normalized}=\frac{x}{255}\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>정규화된 Pixel 값 = 원래 Pixel 값 ÷ 255
+</code></pre></div></div> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">normalized</span> <span class="o">=</span> <span class="n">resized</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+</code></pre></div></div> <p>Pixel 204의 변환:</p> \[\frac{204}{255}=0.8\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>204 ÷ 255 = 0.8
+</code></pre></div></div> <p>여기서 0.8의 의미: 해당 Channel의 정규화된 색상 강도 또는 밝기. Class 확률은 아님.</p> <h3 id="전체-코드">전체 코드</h3> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">cv2</span>
+
+<span class="n">image_bgr</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">imread</span><span class="p">(</span><span class="sh">"</span><span class="s">cat.jpg</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">image_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">cvtColor</span><span class="p">(</span><span class="n">image_bgr</span><span class="p">,</span> <span class="n">cv2</span><span class="p">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
+<span class="n">resized</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="nf">resize</span><span class="p">(</span><span class="n">image_rgb</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+<span class="n">normalized</span> <span class="o">=</span> <span class="n">resized</span><span class="p">.</span><span class="nf">astype</span><span class="p">(</span><span class="sh">"</span><span class="s">float32</span><span class="sh">"</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+</code></pre></div></div> <p><strong>Model-specific Preprocessing:</strong> Pretrained Model이 학습할 때 사용한 Input 변환 규칙</p> <p>Model마다 Training 때 사용한 Pixel 범위가 다름. 어떤 Model은 <code class="language-plaintext highlighter-rouge">0–1</code>을 사용하고, 어떤 Model은 값의 중심이 0이 되도록 <code class="language-plaintext highlighter-rouge">-1–1</code>을 사용.</p> <p>Inference에서도 Input Image의 Pixel 값을 Training 때 사용한 Pixel 값의 범위와 같게 변환해야 함.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>직접 만든 Model이 0–1로 학습됨
+→ Pixel ÷ 255 사용
+
+Pretrained Model이 -1–1로 학습됨
+→ 해당 Model의 preprocess_input() 사용
+</code></pre></div></div> <p><code class="language-plaintext highlighter-rouge">Pixel ÷ 255</code>를 적용한 뒤 <code class="language-plaintext highlighter-rouge">preprocess_input()</code>을 또 적용하면 값을 두 번 변환하게 됨. 따라서 두 방법을 연속으로 사용하지 않고, Model이 요구하는 전처리 방법 하나만 사용.</p> <h2 id="3-convolution-kernel--filter-feature-map">3. Convolution, Kernel / Filter, Feature Map</h2> <p><strong>Convolution:</strong> 작은 Weight 배열을 Image 위에서 이동시키며 지역 Pattern을 계산하는 연산</p> <p><strong>Kernel:</strong> 한 Channel의 작은 영역에 적용되는 Weight 행렬</p> <p><strong>Filter:</strong> 모든 Input Channel에 대응하는 Kernel 묶음</p> <p><strong>Feature Map:</strong> Filter가 각 위치에서 계산한 결과를 모은 Output</p> <p><img src="/assets/img/computer-vision/17-convolution-terms.svg" alt="Convolution, Kernel, Filter, Feature Map의 관계"></p> <p><strong>그림 읽기:</strong> RGB Image의 같은 위치에서 Red, Green, Blue 영역을 선택. 각 영역에 해당 Channel의 Kernel을 적용하고 결과를 모두 더해 Output 값 하나 생성. Filter가 Image 전체를 이동하면 이 값들이 모여 Feature Map 하나 완성.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Channel별 작은 Weight 행렬 = Kernel
+RGB Channel용 Kernel 3개의 묶음 = Filter 1개
+Filter 1개가 Image 전체를 이동한 결과 = Feature Map 1개
+</code></pre></div></div> <h3 id="한-channel의-convolution">한 Channel의 Convolution</h3> \[z=\sum_i\sum_j X_{i,j}K_{i,j}+b\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>z = 현재 Image 영역과 Kernel의 같은 위치끼리 곱한 값의 합 + Bias
+</code></pre></div></div> <table> <thead> <tr> <th>기호</th> <th>의미</th> </tr> </thead> <tbody> <tr> <td>X</td> <td>현재 Kernel이 보는 Input 영역</td> </tr> <tr> <td>K</td> <td>Kernel Weight</td> </tr> <tr> <td>b</td> <td>Bias</td> </tr> <tr> <td>z</td> <td>현재 위치의 Output 값</td> </tr> </tbody> </table> <p>계산 예시:</p> \[X= \begin{bmatrix} 1&amp;2\\ 4&amp;5 \end{bmatrix}, \qquad K= \begin{bmatrix} 1&amp;0\\ 0&amp;-1 \end{bmatrix}\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input 영역 X = [[1, 2],     Kernel K = [[ 1,  0],
+                [4, 5]]                 [ 0, -1]]
+</code></pre></div></div> \[(1\times1)+(2\times0)+(4\times0)+(5\times-1)=-4\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1 × 1) + (2 × 0) + (4 × 0) + (5 × -1) = -4
+</code></pre></div></div> <p>계산 결과 -4: Feature Map의 현재 위치에 저장되는 값.</p> <p><img src="/assets/img/computer-vision/13-convolution-calculation.svg" alt="Convolution 한 위치의 계산"></p> <p><strong>그림 읽기:</strong> Input 영역과 Kernel을 같은 위치끼리 곱한 뒤 모두 더해 Feature Map의 값 하나 생성.</p> <h3 id="rgb-image에서-filter-하나">RGB Image에서 Filter 하나</h3> <p><strong>RGB Input:</strong> Channel 3개</p> <p><strong><code class="language-plaintext highlighter-rouge">3 × 3</code> Filter 하나:</strong> Channel별 <code class="language-plaintext highlighter-rouge">3 × 3</code> Kernel 3개</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Filter 1
+├── Red용   3 × 3 Kernel
+├── Green용 3 × 3 Kernel
+└── Blue용  3 × 3 Kernel
+</code></pre></div></div> <p>Filter 하나의 Shape:</p> \[(3,3,3)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Filter Shape = (Kernel Height 3, Kernel Width 3, Input Channels 3)
+</code></pre></div></div> <p>한 위치의 곱셈 수:</p> \[3\times3\times3=27\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3 × 3 × 3 = 27번의 곱셈
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Red 영역   × Red Kernel
++ Green 영역 × Green Kernel
++ Blue 영역  × Blue Kernel
++ Bias
+= Output 값 하나
+</code></pre></div></div> <p>Filter 하나가 모든 위치를 이동 → Feature Map 하나.</p> <h3 id="filters32"><code class="language-plaintext highlighter-rouge">filters=32</code></h3> <p><strong><code class="language-plaintext highlighter-rouge">filters=32</code>:</strong> 서로 다른 Filter 32개를 학습하겠다는 설정</p> <p>Filter 하나가 Channel 하나만 담당하는 구조가 아님. 32개 Filter 각각이 RGB 세 Channel을 모두 확인.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>같은 RGB 영역
+├── Filter 1  → Output 값 1
+├── Filter 2  → Output 값 2
+├── Filter 3  → Output 값 3
+│
+└── Filter 32 → Output 값 32
+</code></pre></div></div> <p>Output Shape:</p> \[(H,W,3)\rightarrow(H_{out},W_{out},32)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input (H, W, 3) → Output (H_out, W_out, 32)
+</code></pre></div></div> <p>전체 Kernel Weight Shape:</p> \[(3,3,3,32)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>전체 Kernel Weight Shape = (3, 3, 3, 32)
+</code></pre></div></div> <p>마지막 32: Filter 수 = Feature Map 수 = Output Channel 수.</p> <p><img src="/assets/img/computer-vision/02-cnn.svg" alt="RGB Channel과 32개 Filter"></p> <p><strong>그림 읽기:</strong> Filter 하나가 RGB 세 Channel을 동시에 계산해 Feature Map 하나 생성. Filter 32개는 Feature Map 32개 생성.</p> <h3 id="keras-코드">Keras 코드</h3> <p><strong><code class="language-plaintext highlighter-rouge">keras.layers.Conv2D</code>:</strong> 2차원 Image에 Convolution을 수행하는 Layer Class</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">conv</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Conv2D</span><span class="p">(</span>
+    <span class="n">filters</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="n">activation</span><span class="o">=</span><span class="sh">"</span><span class="s">relu</span><span class="sh">"</span>
+<span class="p">)</span>
+</code></pre></div></div> <table> <thead> <tr> <th>Argument</th> <th>핵심 의미</th> </tr> </thead> <tbody> <tr> <td><code class="language-plaintext highlighter-rouge">filters=32</code></td> <td>Filter와 Output Channel 32개</td> </tr> <tr> <td><code class="language-plaintext highlighter-rouge">kernel_size=(3, 3)</code></td> <td>Channel별 Kernel 크기</td> </tr> <tr> <td><code class="language-plaintext highlighter-rouge">activation="relu"</code></td> <td>Convolution 결과에 ReLU 적용</td> </tr> </tbody> </table> <p>어떤 Filter가 Edge, Texture, Shape에 반응할지는 Training으로 결정.</p> <h2 id="4-local-receptive-field-weight-sharing">4. Local Receptive Field, Weight Sharing</h2> <p><strong>Local Receptive Field:</strong> Output 한 값이 직접 확인하는 Input의 지역 영역</p> <p><strong>Weight Sharing:</strong> 같은 Kernel Weight를 모든 공간 위치에서 반복 사용</p> <h3 id="local-receptive-field">Local Receptive Field</h3> <p><code class="language-plaintext highlighter-rouge">3 × 3</code> Kernel의 한 번 계산 범위: 공간 위치 9개. RGB라면 각 위치의 세 Channel을 동시에 확인.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>전체 Image
+┌─────────────────────┐
+│  ┌───────┐          │
+│  │ 3 × 3 │ → 이동   │
+│  └───────┘          │
+│                     │
+└─────────────────────┘
+</code></pre></div></div> <p>핵심: Kernel이 Image 전체를 한 번에 보는 것이 아니라, Kernel 크기만큼 확인하며 이동.</p> <p><img src="/assets/img/computer-vision/09-local-weight-sharing.svg" alt="Local Receptive Field와 Weight Sharing"></p> <p><strong>그림 읽기:</strong> 작은 Kernel이 위치를 옮겨도 같은 Weight 사용. 노란 영역이 Output 한 값의 Local Receptive Field.</p> <h3 id="network-depth와-receptive-field">Network Depth와 Receptive Field</h3> <p>첫 Layer: 원본 Image의 작은 영역 확인.</p> <p>다음 Layer: 앞 Layer의 여러 Feature Map 위치 확인.</p> <p>결과: Layer가 깊어질수록 원본 Image의 더 넓은 영역에 간접적으로 영향받음.</p> <p><img src="/assets/img/computer-vision/14-receptive-field-depth.svg" alt="Layer가 깊어질수록 넓어지는 Receptive Field"></p> <p><strong>그림 읽기:</strong> 연속된 <code class="language-plaintext highlighter-rouge">3 × 3</code> Convolution을 지나면 뒤쪽 값 하나가 참고하는 원본 영역이 단계적으로 확대.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>앞쪽 Layer: Edge, 밝기 변화
+중간 Layer: Texture, 곡선, 모서리
+뒤쪽 Layer: Object 일부, 복잡한 Shape
+</code></pre></div></div> <h3 id="weight-sharing">Weight Sharing</h3> <p>동일한 Filter를 여러 위치에서 사용.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>같은 Filter
+→ Image 왼쪽 위
+→ Image 중앙
+→ Image 오른쪽 아래
+</code></pre></div></div> <p>고양이 귀가 왼쪽에 있든 오른쪽에 있든 같은 Filter로 탐지 가능.</p> <h3 id="parameter-수-비교">Parameter 수 비교</h3> <p><code class="language-plaintext highlighter-rouge">224 × 224 × 3</code> Image를 Dense Neuron 하나에 연결할 때의 Weight 수:</p> \[224\times224\times3=150{,}528\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>224 × 224 × 3 = 150,528개 Weight
+</code></pre></div></div> <p>RGB Image의 <code class="language-plaintext highlighter-rouge">3 × 3</code> Filter 하나가 가진 Weight 수:</p> \[3\times3\times3=27\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3 × 3 × 3 = 27개 Weight
+</code></pre></div></div> <p>Bias 하나를 포함한 Parameter: 28개.</p> <p>같은 28개 Parameter를 여러 위치에서 공유.</p> <p><strong>Weight Sharing의 효과:</strong> Parameter 감소, 위치가 달라도 같은 Feature 탐지, 공간 구조 유지</p> <h2 id="5-overfitting-and-generalization">5. Overfitting and Generalization</h2> <p><strong>Overfitting(과적합):</strong> Training Data의 일반 Pattern뿐 아니라 Noise와 우연한 차이까지 지나치게 학습한 상태</p> <p><strong>Generalization(일반화):</strong> Training에 사용하지 않은 Data에서도 유용한 Prediction을 만드는 능력</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>좋은 Training 성능
++ 좋은 Validation/Test 성능
+= 좋은 Generalization
+</code></pre></div></div> <h3 id="dataset의-역할">Dataset의 역할</h3> <table> <thead> <tr> <th>Dataset</th> <th>핵심 역할</th> </tr> </thead> <tbody> <tr> <td>Training</td> <td>Weight와 Bias 학습</td> </tr> <tr> <td>Validation</td> <td>Hyperparameter, Model, 종료 시점 선택</td> </tr> <tr> <td>Test</td> <td>모든 선택이 끝난 Model의 최종 평가</td> </tr> </tbody> </table> <p>Validation Data: Parameter 업데이트에는 사용하지 않지만 Model 선택에는 사용.</p> <p>Test Data: 최종 평가용. 반복해서 확인하며 설정을 바꾸면 공정한 평가가 어려움.</p> <h3 id="loss-curve-해석">Loss Curve 해석</h3> <p><img src="/assets/img/computer-vision/03-training.svg" alt="Training과 Validation Loss"></p> <p><strong>그림 읽기:</strong> Training Loss는 계속 감소하지만 Validation Loss가 다시 증가하는 구간에서 Overfitting 가능성 확인.</p> <table> <thead> <tr> <th>관찰</th> <th>가능한 해석</th> </tr> </thead> <tbody> <tr> <td>두 Loss가 함께 감소</td> <td>Training과 Validation에서 함께 개선</td> </tr> <tr> <td>두 Loss가 모두 높음</td> <td>Underfitting 가능성</td> </tr> <tr> <td>Training Loss만 계속 감소</td> <td>Training Data에 더 밀착</td> </tr> <tr> <td>Validation Loss가 다시 증가</td> <td>Overfitting 가능성</td> </tr> </tbody> </table> <p>판단 기준: 한 Epoch의 작은 변화가 아니라 여러 Epoch의 추세.</p> <h3 id="loss와-accuracy의-차이">Loss와 Accuracy의 차이</h3> <p><strong>Accuracy:</strong> 정답 여부만 계산</p> <p><strong>Cross-Entropy Loss:</strong> 정답 Class에 부여한 확률까지 반영</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>정답 Class: 1
+
+Prediction A: [0.10, 0.90] → 정답
+Prediction B: [0.40, 0.60] → 정답
+</code></pre></div></div> <p>두 Prediction의 Accuracy는 동일. A가 정답에 더 높은 확률을 주므로 Loss는 더 작음.</p> <h3 id="overfitting을-줄이는-방법">Overfitting을 줄이는 방법</h3> <table> <thead> <tr> <th>방법</th> <th>핵심 설명</th> </tr> </thead> <tbody> <tr> <td>더 다양한 Data</td> <td>우연한 특징을 외우기 어렵게 구성</td> </tr> <tr> <td>Data Augmentation</td> <td>Label을 유지하는 회전, 이동, 밝기 변화 추가</td> </tr> <tr> <td>Model Capacity 감소</td> <td>불필요하게 큰 Layer와 Neuron 축소</td> </tr> <tr> <td>Weight Decay</td> <td>지나치게 큰 Weight에 불이익 적용</td> </tr> <tr> <td>Dropout</td> <td>Training 중 일부 Activation을 무작위로 0 처리</td> </tr> <tr> <td>Early Stopping</td> <td>Validation 성능이 나빠지기 전에 중단</td> </tr> </tbody> </table> <p><strong><code class="language-plaintext highlighter-rouge">EarlyStopping</code>:</strong> Validation 지표를 관찰하는 Keras Callback</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">early_stopping</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="nc">EarlyStopping</span><span class="p">(</span>
+    <span class="n">monitor</span><span class="o">=</span><span class="sh">"</span><span class="s">val_loss</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">restore_best_weights</span><span class="o">=</span><span class="bp">True</span>
+<span class="p">)</span>
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>monitor="val_loss"       : Validation Loss 관찰
+patience=3               : 3 Epoch 동안 개선이 없으면 중단
+restore_best_weights=True: 가장 좋은 시점의 Weight 복원
+</code></pre></div></div> <h2 id="6-pixel-wise-prediction-and-segmentation-mask">6. Pixel-wise Prediction and Segmentation Mask</h2> <p><strong>Pixel-wise Prediction:</strong> Image의 각 Pixel마다 Class 또는 Foreground 확률을 예측하는 방식</p> <p><strong>Segmentation Mask:</strong> 각 Pixel의 최종 Class 정보를 저장한 Image</p> <h3 id="vision-task-비교">Vision Task 비교</h3> <table> <thead> <tr> <th>Task</th> <th>핵심 질문</th> <th>Output</th> </tr> </thead> <tbody> <tr> <td>Classification</td> <td>Image 전체가 무엇인가?</td> <td>Class Label</td> </tr> <tr> <td>Detection</td> <td>무엇이 어디에 있는가?</td> <td>Class와 Bounding Box</td> </tr> <tr> <td>Segmentation</td> <td>각 Pixel은 무엇인가?</td> <td>Pixel-wise Mask</td> </tr> </tbody> </table> <h3 id="binary-segmentation-mask">Binary Segmentation Mask</h3> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0 = Background
+1 = Person
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0 0 0 0 0
+0 0 1 1 0
+0 1 1 1 0
+0 0 1 0 0
+0 0 0 0 0
+</code></pre></div></div> <p><img src="/assets/img/computer-vision/10-segmentation-mask.svg" alt="Pixel-wise Prediction과 Segmentation Mask"></p> <p><strong>그림 읽기:</strong> Model이 Pixel마다 Score를 계산하고, Class 결정 과정을 거쳐 원본과 같은 공간 크기의 Mask 생성.</p> <p>Shape 비교:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input Color Image: (Height, Width, 3)
+Class Mask:        (Height, Width)
+</code></pre></div></div> <p>Input의 3: RGB Channel 수.</p> <p>Mask의 값: 색상이 아니라 Class 번호.</p> <h3 id="binary-pixel-prediction">Binary Pixel Prediction</h3> <p>Pixel마다 Logit 하나 계산 → Sigmoid로 Foreground 확률 생성.</p> \[p=\sigma(z)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Foreground 확률 p = Sigmoid(z)
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>p가 0.5 이상 → 1, Foreground
+p가 0.5 미만 → 0, Background
+</code></pre></div></div> <p>0–1이라는 범위만으로 자동으로 확률이 되는 것은 아님. Output을 Foreground 사건으로 정의하고 그 목적에 맞는 Loss로 Training할 때 Foreground 확률로 해석.</p> <h3 id="multi-class-pixel-prediction">Multi-class Pixel Prediction</h3> <p>Pixel마다 Class별 Logit 계산 → Softmax로 Class별 확률 생성.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>한 Pixel의 Prediction
+
+Background: 0.02
+Road:       0.05
+Car:        0.88
+Person:     0.03
+Building:   0.02
+</code></pre></div></div> <p>가장 높은 확률의 Car → 해당 Pixel의 최종 Class.</p> <h3 id="semantic과-instance-segmentation">Semantic과 Instance Segmentation</h3> <p><strong>Semantic Segmentation:</strong> 같은 Class의 모든 Pixel을 같은 Class 영역으로 표시</p> <p><strong>Instance Segmentation:</strong> 같은 Class의 Object도 개별 Instance로 구분</p> <p><img src="/assets/img/computer-vision/15-semantic-instance.svg" alt="Semantic Segmentation과 Instance Segmentation 비교"></p> <p><strong>그림 읽기:</strong> Semantic Mask는 같은 Class의 두 Object에 같은 값을 사용. Instance Mask는 Object마다 별도 ID 부여.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>사람 두 명
+
+Semantic: Person 영역 전체
+Instance: Person 1 영역 + Person 2 영역
+</code></pre></div></div> <h2 id="7-u-net--encoder-decoder-skip-connection">7. U-Net · Encoder, Decoder, Skip Connection</h2> <p><strong>U-Net:</strong> Encoder에서 압축한 Feature를 Decoder에서 Pixel 해상도로 복원하는 Segmentation 구조</p> <p><strong>구성:</strong> Encoder → Bottleneck → Decoder + Skip Connection</p> <p><img src="/assets/img/computer-vision/16-unet-architecture.svg" alt="U-Net의 Encoder, Decoder, Skip Connection"></p> <p><strong>그림 읽기:</strong> Encoder에서 공간 크기를 줄이고 Channel을 늘린 뒤 Decoder에서 공간 크기 복원. 같은 해상도의 Encoder Feature는 Skip Connection으로 전달.</p> <h3 id="encoder">Encoder</h3> <p><strong>Encoder:</strong> Downsampling하면서 Feature와 넓은 Context를 학습하는 부분</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>256 × 256 × 3
+→ 128 × 128 × 64
+→ 64 × 64 × 128
+→ 32 × 32 × 256
+→ 16 × 16 × 512
+</code></pre></div></div> <p>Height와 Width: 감소.</p> <p>Channel 수: 증가 가능.</p> <p>앞쪽 Feature: Edge와 Texture.</p> <p>뒤쪽 Feature: Object 일부와 복잡한 의미.</p> <p>장점: 계산량 감소, 더 넓은 Pattern 학습.</p> <p>손실: 정확한 위치와 경계 정보 감소.</p> <h3 id="bottleneck">Bottleneck</h3> <p><strong>Bottleneck:</strong> Encoder와 Decoder 사이의 가장 압축된 Feature</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>작은 공간 해상도
++ 많은 Feature Channels
++ 넓은 Context
+</code></pre></div></div> <h3 id="decoder">Decoder</h3> <p><strong>Decoder:</strong> Feature Map의 Height와 Width를 키워 Pixel 위치에 맞는 Mask를 복원하는 부분</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>16 × 16 × 512
+→ 32 × 32 × 256
+→ 64 × 64 × 128
+→ 128 × 128 × 64
+→ 256 × 256 × Classes
+</code></pre></div></div> <p>단순 확대만으로 정확한 경계 복원은 어려움. Encoder의 Downsampling 과정에서 세밀한 위치 정보가 감소했기 때문.</p> <h3 id="skip-connection">Skip Connection</h3> <p><strong>Skip Connection:</strong> Encoder의 고해상도 Feature를 같은 공간 크기의 Decoder에 직접 전달하는 연결</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Encoder Feature: 어디에 있는가?
+Decoder Feature: 무엇인가?
+</code></pre></div></div> <p>U-Net의 일반적인 결합 방식: Channel Concatenation.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Encoder Feature: (64, 64, 128)
+Decoder Feature: (64, 64, 128)
+
+Concatenation:   (64, 64, 256)
+</code></pre></div></div> <p>Height와 Width는 유지. Channel만 128 + 128 = 256.</p> <h3 id="channel-concatenation">Channel Concatenation</h3> <p>같은 Pixel 위치의 Encoder 값:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[e1, e2, e3]
+</code></pre></div></div> <p>같은 위치의 Decoder 값:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[d1, d2]
+</code></pre></div></div> <p>더하기가 아니라 순서대로 연결:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[e1, e2, e3, d1, d2]
+</code></pre></div></div> <p>3 Channels + 2 Channels → 5 Channels.</p> <p>다음 Convolution Layer: Encoder의 위치 정보와 Decoder의 의미 정보를 함께 사용.</p> <h3 id="최종-output">최종 Output</h3> <p>Binary Segmentation:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output Shape = (Height, Width, 1)
+</code></pre></div></div> <p>Class가 5개인 Multi-class Segmentation:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output Shape = (Height, Width, 5)
+</code></pre></div></div> <p>각 Pixel의 Class Score → Sigmoid 또는 Softmax → 최종 Segmentation Mask.</p> <h2 id="발표-마무리">발표 마무리</h2> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. Image: Pixel이 H × W × C로 배열된 구조
+2. Preprocessing: Load → Resize → Normalize
+3. Convolution: Channel별 Kernel 계산 → Feature Map
+4. CNN: Local Receptive Field + Weight Sharing
+5. Evaluation: Validation으로 Overfitting과 Generalization 확인
+6. Segmentation: Pixel마다 Class Prediction
+7. U-Net: 의미 Feature + 위치 Feature → 정밀한 Mask
+</code></pre></div></div> <p>발표를 관통하는 질문:</p> <ul> <li>Input의 Shape과 Pixel 범위는 무엇인가?</li> <li>Filter 하나가 몇 개 Channel을 확인하는가?</li> <li>같은 Weight를 왜 여러 위치에서 사용하는가?</li> <li>Training 성능이 새로운 Data에서도 유지되는가?</li> <li>최종 Output이 Image Class인가, Pixel Mask인가?</li> </ul> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoy Reading This Article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/deep-learning-computer-vision/">Deep Learning for Computer Vision</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/backpropagation/">Deep Learning 기초: Backpropagation과 Chain Rule</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/deep-learning-fundamentals/">Deep Learning 기초: Neuron에서 경사하강법까지</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/chapter-01-multilayer-perceptron-mlp/">Chapter 01. Multilayer Perceptron (MLP)</a> </li> </ul> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Seokchan Hong. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-computer-vision-발표-pixel에서-u-net까지",
+        
+          title: "Computer Vision 발표: Pixel에서 U-Net까지",
+        
+        description: "Pixel과 Image Shape부터 CNN의 Feature 학습, Generalization, Segmentation Mask, U-Net까지 발표 흐름에 맞춰 정리한다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computer-vision-pixel-to-unet/";
+          
+        },
+      },{id: "post-deep-learning-for-computer-vision",
+        
+          title: "Deep Learning for Computer Vision",
+        
+        description: "Image 표현부터 CNN, Training, Transfer Learning, Object Detection, Segmentation까지 Computer Vision의 핵심 흐름을 정리한다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deep-learning-computer-vision/";
+          
+        },
+      },{id: "post-deep-learning-기초-backpropagation과-chain-rule",
+        
+          title: "Deep Learning 기초: Backpropagation과 Chain Rule",
+        
+        description: "Output의 오차가 앞쪽 Layer에 전달되는 과정을 살펴보고, Chain Rule로 Weight와 Bias의 Gradient를 계산한다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/backpropagation/";
+          
+        },
+      },{id: "post-deep-learning-기초-neuron에서-경사하강법까지",
+        
+          title: "Deep Learning 기초: Neuron에서 경사하강법까지",
+        
+        description: "간단한 예시와 수식으로 Neural Network의 계산과 학습 과정을 정리한다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deep-learning-fundamentals/";
+          
+        },
+      },{id: "post-chapter-01-multilayer-perceptron-mlp",
+        
+          title: "Chapter 01. Multilayer Perceptron (MLP)",
+        
+        description: "이번 학습에서는 Multilayer Perceptron의 구조와 학습 원리를 이론적·수학적 관점에서 살펴보고, 주요 개념과 동작 과정을 자신의 언어로 설명할 수 있는 수준까지 이해하는 것을 목표로 합니다. 특히 Neural Network가 입력으로부터 출력을 계산하는 과정과, 예측 오차를 이용하여 Weight와 Bias를 업데이트하는 과정을 수식 수준에서 이해하는 것을 목표로 합니다.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/chapter-01-multilayer-perceptron-mlp/";
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "projects-project-3-with-very-long-name",
+          title: 'project 3 with very long name',
+          description: "a project that redirects to another website",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_project/";
+            },},{id: "projects-project-4",
+          title: 'project 4',
+          description: "another without an image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_project/";
+            },},{id: "projects-project-5",
+          title: 'project 5',
+          description: "a project with a background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_project/";
+            },},{id: "projects-project-6",
+          title: 'project 6',
+          description: "a project with no image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_project/";
+            },},{id: "projects-project-7",
+          title: 'project 7',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/7_project/";
+            },},{id: "projects-project-8",
+          title: 'project 8',
+          description: "an other project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/8_project/";
+            },},{id: "projects-project-9",
+          title: 'project 9',
+          description: "another project with an image 🎉",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/9_project/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/example_pdf.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%75@%65%78%61%6D%70%6C%65.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-inspire',
+        title: 'Inspire HEP',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://inspirehep.net/authors/1010907", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-scholar',
+        title: 'Google Scholar',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://scholar.google.com/citations?user=qc6CJjYAAAAJ", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.alberteinstein.com/", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
