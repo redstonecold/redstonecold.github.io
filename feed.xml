@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://redstonecold.github.io/feed.xml" rel="self" type="application/atom+xml"/><link href="https://redstonecold.github.io/" rel="alternate" type="text/html" hreflang="en"/><updated>2026-09-29T12:01:06+00:00</updated><id>https://redstonecold.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design. </subtitle><entry><title type="html">Computer Vision 발표: Pixel에서 U-Net까지</title><link href="https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet/" rel="alternate" type="text/html" title="Computer Vision 발표: Pixel에서 U-Net까지"/><published>2026-09-29T00:00:00+00:00</published><updated>2026-09-29T00:00:00+00:00</updated><id>https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet</id><content type="html" xml:base="https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet/"><![CDATA[<style>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://redstonecold.github.io/feed.xml" rel="self" type="application/atom+xml"/><link href="https://redstonecold.github.io/" rel="alternate" type="text/html" hreflang="en"/><updated>2026-09-29T12:11:41+00:00</updated><id>https://redstonecold.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design. </subtitle><entry><title type="html">Computer Vision 발표: Pixel에서 U-Net까지</title><link href="https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet/" rel="alternate" type="text/html" title="Computer Vision 발표: Pixel에서 U-Net까지"/><published>2026-09-29T00:00:00+00:00</published><updated>2026-09-29T00:00:00+00:00</updated><id>https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet</id><content type="html" xml:base="https://redstonecold.github.io/blog/2026/computer-vision-pixel-to-unet/"><![CDATA[<style>
 article h2 { margin-top: 3.5rem; }
 article h3 { margin-top: 2.3rem; }
 article img { max-width: 100%; height: auto; }
@@ -212,9 +212,30 @@ Concatenation:   (64, 64, 256)
 </code></pre></div></div> <p>Height와 Width는 유지. Channel만 128 + 128 = 256.</p> <h3 id="channel-concatenation">Channel Concatenation</h3> <p>같은 Pixel 위치의 Encoder 값:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[e1, e2, e3]
 </code></pre></div></div> <p>같은 위치의 Decoder 값:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[d1, d2]
 </code></pre></div></div> <p>더하기가 아니라 순서대로 연결:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[e1, e2, e3, d1, d2]
-</code></pre></div></div> <p>3 Channels + 2 Channels → 5 Channels.</p> <p>다음 Convolution Layer: Encoder의 위치 정보와 Decoder의 의미 정보를 함께 사용.</p> <h3 id="최종-output">최종 Output</h3> <p>Binary Segmentation:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output Shape = (Height, Width, 1)
-</code></pre></div></div> <p>Class가 5개인 Multi-class Segmentation:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output Shape = (Height, Width, 5)
-</code></pre></div></div> <p>각 Pixel의 Class Score → Sigmoid 또는 Softmax → 최종 Segmentation Mask.</p> <h2 id="발표-마무리">발표 마무리</h2> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. Image: Pixel이 H × W × C로 배열된 구조
+</code></pre></div></div> <p>3 Channels + 2 Channels → 5 Channels.</p> <p>다음 Convolution Layer: Encoder의 위치 정보와 Decoder의 의미 정보를 함께 사용.</p> <h3 id="최종-output">최종 Output</h3> <p><strong>최종 Output Shape:</strong> 모든 Pixel에 대한 Class Score를 배열한 구조</p> <h4 id="binary-segmentation">Binary Segmentation</h4> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output Shape = (Height, Width, 1)
+
+Height → 세로 Pixel 수
+Width  → 가로 Pixel 수
+1      → Pixel마다 출력하는 Foreground Logit 1개
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>각 Pixel의 Logit 1개
+→ Sigmoid
+→ Foreground 확률
+→ 0.5 이상이면 1, 미만이면 0
+</code></pre></div></div> <p>예를 들어 Sigmoid를 통과한 Output의 한 위치가 <code class="language-plaintext highlighter-rouge">0.92</code>라면 해당 Pixel을 Foreground로 판단. 모든 Pixel에서 판단을 마치면 0과 1로 구성된 Binary Mask 생성.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Sigmoid Output: (Height, Width, 1) → Pixel마다 확률 1개
+최종 Mask:      (Height, Width)    → Pixel마다 Class 번호 0 또는 1
+</code></pre></div></div> <h4 id="class가-5개인-multi-class-segmentation">Class가 5개인 Multi-class Segmentation</h4> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output Shape = (Height, Width, 5)
+
+Height → 세로 Pixel 수
+Width  → 가로 Pixel 수
+5      → Pixel마다 출력하는 Class별 Logit 5개
+</code></pre></div></div> <p>한 Pixel에는 다음과 같이 Class별 Logit 5개가 존재.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Background, Person, Car, Road, Building]
+</code></pre></div></div> <p>Softmax를 적용하면 Logit 5개가 합이 1인 Class별 확률로 변환. 가장 높은 확률의 Class를 해당 Pixel의 최종 Class로 선택.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>한 Pixel의 Logit 5개
+→ Softmax
+→ Class 확률 5개
+→ 가장 높은 확률의 Class 선택
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Softmax Output: (Height, Width, 5) → Pixel마다 Class별 확률 5개
+최종 Mask:      (Height, Width)    → Pixel마다 선택된 Class 번호 1개
+</code></pre></div></div> <table> <thead> <tr> <th>구분</th> <th>마지막 숫자의 의미</th> <th>확률 변환</th> <th>최종 Pixel 값</th> </tr> </thead> <tbody> <tr> <td>Binary Segmentation</td> <td>Foreground Logit 1개</td> <td>Sigmoid</td> <td><code class="language-plaintext highlighter-rouge">0</code> 또는 <code class="language-plaintext highlighter-rouge">1</code></td> </tr> <tr> <td>5-Class Segmentation</td> <td>Class별 Logit 5개</td> <td>Softmax</td> <td><code class="language-plaintext highlighter-rouge">0</code>부터 <code class="language-plaintext highlighter-rouge">4</code>까지의 Class 번호</td> </tr> </tbody> </table> <h2 id="발표-마무리">발표 마무리</h2> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. Image: Pixel이 H × W × C로 배열된 구조
 2. Preprocessing: Load → Resize → Normalize
 3. Convolution: Channel별 Kernel 계산 → Feature Map
 4. CNN: Local Receptive Field + Weight Sharing
