@@ -66,25 +66,59 @@ Image Shape:          (Height, Width, Channels)
 
 Pretrained Model이 -1–1로 학습됨
 → 해당 Model의 preprocess_input() 사용
-</code></pre></div></div> <p><code class="language-plaintext highlighter-rouge">Pixel ÷ 255</code>를 적용한 뒤 <code class="language-plaintext highlighter-rouge">preprocess_input()</code>을 또 적용하면 값을 두 번 변환하게 됨. 따라서 두 방법을 연속으로 사용하지 않고, Model이 요구하는 전처리 방법 하나만 사용.</p> <h2 id="3-convolution-kernel--filter-feature-map">3. Convolution, Kernel / Filter, Feature Map</h2> <p><strong>Convolution:</strong> 작은 Weight 배열을 Image 위에서 이동시키며 지역 Pattern을 계산하는 연산</p> <p><strong>Kernel:</strong> 한 Channel의 작은 영역에 적용되는 Weight 행렬</p> <p><strong>Filter:</strong> 모든 Input Channel에 대응하는 Kernel 묶음</p> <p><strong>Feature Map:</strong> Filter가 각 위치에서 계산한 결과를 모은 Output</p> <p><img src="/assets/img/computer-vision/17-convolution-terms.svg" alt="Convolution, Kernel, Filter, Feature Map의 관계"></p> <p><strong>그림 읽기:</strong> RGB Image의 같은 위치에서 Red, Green, Blue 영역을 선택. 각 영역에 해당 Channel의 Kernel을 적용하고 결과를 모두 더해 Output 값 하나 생성. Filter가 Image 전체를 이동하면 이 값들이 모여 Feature Map 하나 완성.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Channel별 작은 Weight 행렬 = Kernel
+</code></pre></div></div> <p><code class="language-plaintext highlighter-rouge">Pixel ÷ 255</code>를 적용한 뒤 <code class="language-plaintext highlighter-rouge">preprocess_input()</code>을 또 적용하면 값을 두 번 변환하게 됨. 따라서 두 방법을 연속으로 사용하지 않고, Model이 요구하는 전처리 방법 하나만 사용.</p> <h2 id="3-convolution-kernel--filter-feature-map">3. Convolution, Kernel / Filter, Feature Map</h2> <p><strong>Convolution:</strong> Input의 작은 영역과 Weight를 곱하고 더해 지역 Pattern을 계산하는 연산</p> <p><strong>Kernel:</strong> Convolution 연산에서 한 Input Channel에 사용하는 작은 Weight Matrix(가중치 행렬)</p> <p><strong>Filter:</strong> 모든 Input Channel에 대응하는 Kernel 묶음</p> <p><strong>Feature Map:</strong> Filter가 각 위치에서 계산한 결과를 모은 Output</p> <p><img src="/assets/img/computer-vision/17-convolution-terms.svg" alt="Convolution, Kernel, Filter, Feature Map의 관계"></p> <p><strong>그림 읽기:</strong> RGB Image의 같은 위치에서 Red, Green, Blue 영역을 선택. 각 영역에 해당 Channel의 Kernel을 적용하고 결과를 모두 더해 Output 값 하나 생성. Filter가 Image 전체를 이동하면 이 값들이 모여 Feature Map 하나 완성.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Channel별 작은 Weight 행렬 = Kernel
 RGB Channel용 Kernel 3개의 묶음 = Filter 1개
 Filter 1개가 Image 전체를 이동한 결과 = Feature Map 1개
-</code></pre></div></div> <h3 id="한-channel의-convolution">한 Channel의 Convolution</h3> \[z=\sum_i\sum_j X_{i,j}K_{i,j}+b\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>z = 현재 Image 영역과 Kernel의 같은 위치끼리 곱한 값의 합 + Bias
-</code></pre></div></div> <table> <thead> <tr> <th>기호</th> <th>의미</th> </tr> </thead> <tbody> <tr> <td>X</td> <td>현재 Kernel이 보는 Input 영역</td> </tr> <tr> <td>K</td> <td>Kernel Weight</td> </tr> <tr> <td>b</td> <td>Bias</td> </tr> <tr> <td>z</td> <td>현재 위치의 Output 값</td> </tr> </tbody> </table> <p>계산 예시:</p> \[X= \begin{bmatrix} 1&amp;2\\ 4&amp;5 \end{bmatrix}, \qquad K= \begin{bmatrix} 1&amp;0\\ 0&amp;-1 \end{bmatrix}\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input 영역 X = [[1, 2],     Kernel K = [[ 1,  0],
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Convolution = 연산
+Kernel      = 그 연산에 사용하는 Weight Matrix
+</code></pre></div></div> <p>여기서 Matrix는 Kernel의 모양이 행과 열로 이루어진 2차원 배열이라는 뜻. Convolution에서 일반적인 Matrix Multiplication(행렬곱)을 수행한다는 뜻은 아님.</p> <h3 id="한-channel의-convolution">한 Channel의 Convolution</h3> <p><strong><code class="language-plaintext highlighter-rouge">3 × 3</code> Kernel:</strong> 세로 3칸, 가로 3칸인 Kernel</p> <p>여기서 <code class="language-plaintext highlighter-rouge">3 × 3</code>은 연산을 적은 것이 아니라 Kernel의 크기를 나타냄. Kernel 안에는 9개의 Weight가 존재.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Kernel
+[k₁  k₂  k₃]
+[k₄  k₅  k₆]
+[k₇  k₈  k₉]
+
+현재 Kernel이 보는 Image 영역
+[x₁  x₂  x₃]
+[x₄  x₅  x₆]
+[x₇  x₈  x₉]
+</code></pre></div></div> <p>같은 자리에 있는 Pixel 값과 Kernel Weight를 하나씩 곱함.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>x₁×k₁, x₂×k₂, ... , x₉×k₉
+
+3 × 3 영역의 Pixel 값 9개
+× Kernel Weight 9개와 각각 대응
+= 곱셈 9번
+</code></pre></div></div> <p>9개의 곱셈 결과를 모두 더하고 Bias를 더하면 <strong>현재 위치의 Output 값 하나</strong> 생성.</p> \[z=\sum_i\sum_j X_{i,j}K_{i,j}+b\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>z = 현재 Image 영역과 Kernel의 같은 위치끼리 곱한 값의 합 + Bias
+</code></pre></div></div> <table> <thead> <tr> <th>기호</th> <th>의미</th> </tr> </thead> <tbody> <tr> <td>X</td> <td>현재 Kernel이 보는 Input 영역</td> </tr> <tr> <td>K</td> <td>Kernel Weight</td> </tr> <tr> <td>b</td> <td>Bias</td> </tr> <tr> <td>z</td> <td>현재 위치의 Output 값</td> </tr> </tbody> </table> <p><strong>Bias:</strong> Filter가 계산한 값 전체를 이동시켜 Pattern에 어느 정도부터 반응할지 조절하는 값</p> <p>예를 들어 Kernel 계산의 합이 2이고 뒤에 ReLU가 있다면 다음과 같음.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Bias =  0 → z =  2 → ReLU(2)  = 2
+Bias = -3 → z = -1 → ReLU(-1) = 0
+Bias =  2 → z =  4 → ReLU(4)  = 4
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Kernel Weight → 어떤 Pattern을 확인할지 결정
+Bias          → 그 Pattern에 어느 정도부터 반응할지 조절
+</code></pre></div></div> <p>일반적인 Convolution Layer에서는 Filter마다 Bias 하나 사용. 같은 Filter가 만든 Feature Map의 모든 위치에 같은 Bias를 더함.</p> <p>계산 예시:</p> \[X= \begin{bmatrix} 1&amp;2\\ 4&amp;5 \end{bmatrix}, \qquad K= \begin{bmatrix} 1&amp;0\\ 0&amp;-1 \end{bmatrix}\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input 영역 X = [[1, 2],     Kernel K = [[ 1,  0],
                 [4, 5]]                 [ 0, -1]]
 </code></pre></div></div> \[(1\times1)+(2\times0)+(4\times0)+(5\times-1)=-4\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1 × 1) + (2 × 0) + (4 × 0) + (5 × -1) = -4
-</code></pre></div></div> <p>계산 결과 -4: Feature Map의 현재 위치에 저장되는 값.</p> <p><img src="/assets/img/computer-vision/13-convolution-calculation.svg" alt="Convolution 한 위치의 계산"></p> <p><strong>그림 읽기:</strong> Input 영역과 Kernel을 같은 위치끼리 곱한 뒤 모두 더해 Feature Map의 값 하나 생성.</p> <h3 id="rgb-image에서-filter-하나">RGB Image에서 Filter 하나</h3> <p><strong>RGB Input:</strong> Channel 3개</p> <p><strong><code class="language-plaintext highlighter-rouge">3 × 3</code> Filter 하나:</strong> Channel별 <code class="language-plaintext highlighter-rouge">3 × 3</code> Kernel 3개</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Filter 1
+</code></pre></div></div> <p>계산 결과 -4: Feature Map의 현재 위치에 저장되는 값 하나.</p> <p><img src="/assets/img/computer-vision/13-convolution-calculation.svg" alt="Convolution 한 위치의 계산"></p> <p><strong>그림 읽기:</strong> Input 영역과 Kernel을 같은 위치끼리 곱한 뒤 모두 더해 Feature Map의 값 하나 생성.</p> <h3 id="rgb-image에서-filter-하나">RGB Image에서 Filter 하나</h3> <p><strong>RGB Input:</strong> Channel 3개</p> <p><strong><code class="language-plaintext highlighter-rouge">3 × 3</code> Filter 하나:</strong> Channel별 <code class="language-plaintext highlighter-rouge">3 × 3</code> Kernel 3개</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Filter 1
 ├── Red용   3 × 3 Kernel
 ├── Green용 3 × 3 Kernel
 └── Blue용  3 × 3 Kernel
 </code></pre></div></div> <p>Filter 하나의 Shape:</p> \[(3,3,3)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Filter Shape = (Kernel Height 3, Kernel Width 3, Input Channels 3)
-</code></pre></div></div> <p>한 위치의 곱셈 수:</p> \[3\times3\times3=27\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3 × 3 × 3 = 27번의 곱셈
-</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Red 영역   × Red Kernel
-+ Green 영역 × Green Kernel
-+ Blue 영역  × Blue Kernel
+</code></pre></div></div> <h4 id="rgb-한-위치에서-곱셈이-27번인-이유">RGB 한 위치에서 곱셈이 27번인 이유</h4> <p>Convolution에서는 Image 영역과 Kernel을 일반적인 Matrix Multiplication(행렬곱)으로 계산하지 않음. <strong>같은 위치의 원소끼리 곱한 뒤 그 결과를 모두 더함.</strong></p> <p>한 Channel의 계산:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Image의 3 × 3 영역        3 × 3 Kernel
+
+[x₁  x₂  x₃]              [k₁  k₂  k₃]
+[x₄  x₅  x₆]              [k₄  k₅  k₆]
+[x₇  x₈  x₉]              [k₇  k₈  k₉]
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>x₁k₁ + x₂k₂ + x₃k₃
++ x₄k₄ + x₅k₅ + x₆k₆
++ x₇k₇ + x₈k₈ + x₉k₉
+</code></pre></div></div> <p><code class="language-plaintext highlighter-rouge">3 × 3</code> 영역에는 Pixel 값이 9개 있고 Kernel에도 Weight가 9개 있음. 같은 위치끼리 한 번씩 곱하므로 한 Channel에서 곱셈 9번 발생.</p> <p>RGB Image에서는 이 계산을 Channel마다 수행.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Red Channel의 3 × 3 영역   ↔ Red Kernel   → 원소별 곱셈 9번
+Green Channel의 3 × 3 영역 ↔ Green Kernel → 원소별 곱셈 9번
+Blue Channel의 3 × 3 영역  ↔ Blue Kernel  → 원소별 곱셈 9번
+</code></pre></div></div> <p>한 위치의 전체 곱셈 수:</p> \[3\times3\times3=27\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Kernel Height × Kernel Width × Input Channel 수
+= 3 × 3 × 3
+= 27번의 원소별 곱셈
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Red Channel의 곱셈 결과 9개
++ Green Channel의 곱셈 결과 9개
++ Blue Channel의 곱셈 결과 9개
 + Bias
 = Output 값 하나
-</code></pre></div></div> <p>Filter 하나가 모든 위치를 이동 → Feature Map 하나.</p> <h3 id="filters32"><code class="language-plaintext highlighter-rouge">filters=32</code></h3> <p><strong><code class="language-plaintext highlighter-rouge">filters=32</code>:</strong> 서로 다른 Filter 32개를 학습하겠다는 설정</p> <p>Filter 하나가 Channel 하나만 담당하는 구조가 아님. 32개 Filter 각각이 RGB 세 Channel을 모두 확인.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>같은 RGB 영역
+</code></pre></div></div> <p>27개의 Output이 나오는 것이 아님. 27개의 원소별 곱셈 결과와 Bias를 모두 더해 <strong>Output 값 하나</strong> 생성.</p> <p>Filter 하나가 모든 위치를 이동 → Feature Map 하나.</p> <h3 id="filters32"><code class="language-plaintext highlighter-rouge">filters=32</code></h3> <p><strong><code class="language-plaintext highlighter-rouge">filters=32</code>:</strong> 서로 다른 Filter 32개를 학습하겠다는 설정</p> <p>Filter 하나가 Channel 하나만 담당하는 구조가 아님. 32개 Filter 각각이 RGB 세 Channel을 모두 확인.</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>같은 RGB 영역
 ├── Filter 1  → Output 값 1
 ├── Filter 2  → Output 값 2
 ├── Filter 3  → Output 값 3
@@ -92,6 +126,17 @@ Filter 1개가 Image 전체를 이동한 결과 = Feature Map 1개
 └── Filter 32 → Output 값 32
 </code></pre></div></div> <p>Output Shape:</p> \[(H,W,3)\rightarrow(H_{out},W_{out},32)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input (H, W, 3) → Output (H_out, W_out, 32)
 </code></pre></div></div> <p>전체 Kernel Weight Shape:</p> \[(3,3,3,32)\] <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>전체 Kernel Weight Shape = (3, 3, 3, 32)
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(3, 3, 3, 32)
+ │  │  │   └─ Filter 32개
+ │  │  └──── Input Channel 3개: Red, Green, Blue
+ └──┴─────── Channel별 Kernel 크기: 3 × 3
+</code></pre></div></div> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Filter 1  = 3 × 3 × 3
+Filter 2  = 3 × 3 × 3
+...
+Filter 32 = 3 × 3 × 3
+</code></pre></div></div> <p>전체 Weight 수와 Bias 수:</p> <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3 × 3 × 3 × 32 = Weight 864개
+Filter마다 Bias 1개 = Bias 32개
+전체 Parameter = 864 + 32 = 896개
 </code></pre></div></div> <p>마지막 32: Filter 수 = Feature Map 수 = Output Channel 수.</p> <p><img src="/assets/img/computer-vision/02-cnn.svg" alt="RGB Channel과 32개 Filter"></p> <p><strong>그림 읽기:</strong> Filter 하나가 RGB 세 Channel을 동시에 계산해 Feature Map 하나 생성. Filter 32개는 Feature Map 32개 생성.</p> <h3 id="keras-코드">Keras 코드</h3> <p><strong><code class="language-plaintext highlighter-rouge">keras.layers.Conv2D</code>:</strong> 2차원 Image에 Convolution을 수행하는 Layer Class</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">conv</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Conv2D</span><span class="p">(</span>
     <span class="n">filters</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
