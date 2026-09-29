@@ -313,9 +313,9 @@ Pretrained Model이 -1–1로 학습됨
 
 ## 3. Convolution, Kernel / Filter, Feature Map
 
-**Convolution:** 작은 Weight 배열을 Image 위에서 이동시키며 지역 Pattern을 계산하는 연산
+**Convolution:** Input의 작은 영역과 Weight를 곱하고 더해 지역 Pattern을 계산하는 연산
 
-**Kernel:** 한 Channel의 작은 영역에 적용되는 Weight 행렬
+**Kernel:** Convolution 연산에서 한 Input Channel에 사용하는 작은 Weight Matrix(가중치 행렬)
 
 **Filter:** 모든 Input Channel에 대응하는 Kernel 묶음
 
@@ -331,7 +331,42 @@ RGB Channel용 Kernel 3개의 묶음 = Filter 1개
 Filter 1개가 Image 전체를 이동한 결과 = Feature Map 1개
 ```
 
+```text
+Convolution = 연산
+Kernel      = 그 연산에 사용하는 Weight Matrix
+```
+
+여기서 Matrix는 Kernel의 모양이 행과 열로 이루어진 2차원 배열이라는 뜻. Convolution에서 일반적인 Matrix Multiplication(행렬곱)을 수행한다는 뜻은 아님.
+
 ### 한 Channel의 Convolution
+
+**`3 × 3` Kernel:** 세로 3칸, 가로 3칸인 Kernel
+
+여기서 `3 × 3`은 연산을 적은 것이 아니라 Kernel의 크기를 나타냄. Kernel 안에는 9개의 Weight가 존재.
+
+```text
+Kernel
+[k₁  k₂  k₃]
+[k₄  k₅  k₆]
+[k₇  k₈  k₉]
+
+현재 Kernel이 보는 Image 영역
+[x₁  x₂  x₃]
+[x₄  x₅  x₆]
+[x₇  x₈  x₉]
+```
+
+같은 자리에 있는 Pixel 값과 Kernel Weight를 하나씩 곱함.
+
+```text
+x₁×k₁, x₂×k₂, ... , x₉×k₉
+
+3 × 3 영역의 Pixel 값 9개
+× Kernel Weight 9개와 각각 대응
+= 곱셈 9번
+```
+
+9개의 곱셈 결과를 모두 더하고 Bias를 더하면 **현재 위치의 Output 값 하나** 생성.
 
 $$
 z=\sum_i\sum_j X_{i,j}K_{i,j}+b
@@ -347,6 +382,23 @@ z = 현재 Image 영역과 Kernel의 같은 위치끼리 곱한 값의 합 + Bia
 | K | Kernel Weight |
 | b | Bias |
 | z | 현재 위치의 Output 값 |
+
+**Bias:** Filter가 계산한 값 전체를 이동시켜 Pattern에 어느 정도부터 반응할지 조절하는 값
+
+예를 들어 Kernel 계산의 합이 2이고 뒤에 ReLU가 있다면 다음과 같음.
+
+```text
+Bias =  0 → z =  2 → ReLU(2)  = 2
+Bias = -3 → z = -1 → ReLU(-1) = 0
+Bias =  2 → z =  4 → ReLU(4)  = 4
+```
+
+```text
+Kernel Weight → 어떤 Pattern을 확인할지 결정
+Bias          → 그 Pattern에 어느 정도부터 반응할지 조절
+```
+
+일반적인 Convolution Layer에서는 Filter마다 Bias 하나 사용. 같은 Filter가 만든 Feature Map의 모든 위치에 같은 Bias를 더함.
 
 계산 예시:
 
@@ -377,7 +429,7 @@ $$
 (1 × 1) + (2 × 0) + (4 × 0) + (5 × -1) = -4
 ```
 
-계산 결과 -4: Feature Map의 현재 위치에 저장되는 값.
+계산 결과 -4: Feature Map의 현재 위치에 저장되는 값 하나.
 
 ![Convolution 한 위치의 계산](/assets/img/computer-vision/13-convolution-calculation.svg)
 
@@ -406,23 +458,57 @@ $$
 Filter Shape = (Kernel Height 3, Kernel Width 3, Input Channels 3)
 ```
 
-한 위치의 곱셈 수:
+#### RGB 한 위치에서 곱셈이 27번인 이유
+
+Convolution에서는 Image 영역과 Kernel을 일반적인 Matrix Multiplication(행렬곱)으로 계산하지 않음. **같은 위치의 원소끼리 곱한 뒤 그 결과를 모두 더함.**
+
+한 Channel의 계산:
+
+```text
+Image의 3 × 3 영역        3 × 3 Kernel
+
+[x₁  x₂  x₃]              [k₁  k₂  k₃]
+[x₄  x₅  x₆]              [k₄  k₅  k₆]
+[x₇  x₈  x₉]              [k₇  k₈  k₉]
+```
+
+```text
+x₁k₁ + x₂k₂ + x₃k₃
++ x₄k₄ + x₅k₅ + x₆k₆
++ x₇k₇ + x₈k₈ + x₉k₉
+```
+
+`3 × 3` 영역에는 Pixel 값이 9개 있고 Kernel에도 Weight가 9개 있음. 같은 위치끼리 한 번씩 곱하므로 한 Channel에서 곱셈 9번 발생.
+
+RGB Image에서는 이 계산을 Channel마다 수행.
+
+```text
+Red Channel의 3 × 3 영역   ↔ Red Kernel   → 원소별 곱셈 9번
+Green Channel의 3 × 3 영역 ↔ Green Kernel → 원소별 곱셈 9번
+Blue Channel의 3 × 3 영역  ↔ Blue Kernel  → 원소별 곱셈 9번
+```
+
+한 위치의 전체 곱셈 수:
 
 $$
 3\times3\times3=27
 $$
 
 ```text
-3 × 3 × 3 = 27번의 곱셈
+Kernel Height × Kernel Width × Input Channel 수
+= 3 × 3 × 3
+= 27번의 원소별 곱셈
 ```
 
 ```text
-Red 영역   × Red Kernel
-+ Green 영역 × Green Kernel
-+ Blue 영역  × Blue Kernel
+Red Channel의 곱셈 결과 9개
++ Green Channel의 곱셈 결과 9개
++ Blue Channel의 곱셈 결과 9개
 + Bias
 = Output 값 하나
 ```
+
+27개의 Output이 나오는 것이 아님. 27개의 원소별 곱셈 결과와 Bias를 모두 더해 **Output 값 하나** 생성.
 
 Filter 하나가 모든 위치를 이동 → Feature Map 하나.
 
@@ -459,6 +545,28 @@ $$
 
 ```text
 전체 Kernel Weight Shape = (3, 3, 3, 32)
+```
+
+```text
+(3, 3, 3, 32)
+ │  │  │   └─ Filter 32개
+ │  │  └──── Input Channel 3개: Red, Green, Blue
+ └──┴─────── Channel별 Kernel 크기: 3 × 3
+```
+
+```text
+Filter 1  = 3 × 3 × 3
+Filter 2  = 3 × 3 × 3
+...
+Filter 32 = 3 × 3 × 3
+```
+
+전체 Weight 수와 Bias 수:
+
+```text
+3 × 3 × 3 × 32 = Weight 864개
+Filter마다 Bias 1개 = Bias 32개
+전체 Parameter = 864 + 32 = 896개
 ```
 
 마지막 32: Filter 수 = Feature Map 수 = Output Channel 수.
