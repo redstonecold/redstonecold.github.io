@@ -961,19 +961,66 @@ Height와 Width는 유지. Channel만 128 + 128 = 256.
 
 ### 최종 Output
 
-Binary Segmentation:
+**최종 Output Shape:** 모든 Pixel에 대한 Class Score를 배열한 구조
+
+#### Binary Segmentation
 
 ```text
 Output Shape = (Height, Width, 1)
+
+Height → 세로 Pixel 수
+Width  → 가로 Pixel 수
+1      → Pixel마다 출력하는 Foreground Logit 1개
 ```
 
-Class가 5개인 Multi-class Segmentation:
+```text
+각 Pixel의 Logit 1개
+→ Sigmoid
+→ Foreground 확률
+→ 0.5 이상이면 1, 미만이면 0
+```
+
+예를 들어 Sigmoid를 통과한 Output의 한 위치가 `0.92`라면 해당 Pixel을 Foreground로 판단. 모든 Pixel에서 판단을 마치면 0과 1로 구성된 Binary Mask 생성.
+
+```text
+Sigmoid Output: (Height, Width, 1) → Pixel마다 확률 1개
+최종 Mask:      (Height, Width)    → Pixel마다 Class 번호 0 또는 1
+```
+
+#### Class가 5개인 Multi-class Segmentation
 
 ```text
 Output Shape = (Height, Width, 5)
+
+Height → 세로 Pixel 수
+Width  → 가로 Pixel 수
+5      → Pixel마다 출력하는 Class별 Logit 5개
 ```
 
-각 Pixel의 Class Score → Sigmoid 또는 Softmax → 최종 Segmentation Mask.
+한 Pixel에는 다음과 같이 Class별 Logit 5개가 존재.
+
+```text
+[Background, Person, Car, Road, Building]
+```
+
+Softmax를 적용하면 Logit 5개가 합이 1인 Class별 확률로 변환. 가장 높은 확률의 Class를 해당 Pixel의 최종 Class로 선택.
+
+```text
+한 Pixel의 Logit 5개
+→ Softmax
+→ Class 확률 5개
+→ 가장 높은 확률의 Class 선택
+```
+
+```text
+Softmax Output: (Height, Width, 5) → Pixel마다 Class별 확률 5개
+최종 Mask:      (Height, Width)    → Pixel마다 선택된 Class 번호 1개
+```
+
+| 구분 | 마지막 숫자의 의미 | 확률 변환 | 최종 Pixel 값 |
+| --- | --- | --- | --- |
+| Binary Segmentation | Foreground Logit 1개 | Sigmoid | `0` 또는 `1` |
+| 5-Class Segmentation | Class별 Logit 5개 | Softmax | `0`부터 `4`까지의 Class 번호 |
 
 ## 발표 마무리
 
