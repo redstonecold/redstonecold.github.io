@@ -27,12 +27,6 @@ latest_posts:
   limit: 3 # leave blank to include all the blog posts
 ---
 
-## 발표 자료
-
-[**경동맥 초음파 AI 발표 자료 →**]({{ '/presentation-carotid-ai-plan/' | relative_url }})
-
-Life Step Internship · 경동맥 초음파 AI 측정·검토 지원 프로젝트 발표 자료입니다.
-
 Write your biography here. Tell the world about yourself. Link to your favorite [subreddit](https://www.reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder.
 
 Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page]({{ '/publications/' | relative_url }}) automatically.
