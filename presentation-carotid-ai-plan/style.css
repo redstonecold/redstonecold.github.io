@@ -1,0 +1,771 @@
+.carotid-plan .slide {
+  padding: 70px 92px;
+}
+
+/* 내용 묶음을 슬라이드 위 여백(70px)과 하단 쪽번호 위 사이의 세로 가운데에 둔다 */
+.carotid-plan .slide-body {
+  height: calc(100% - 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 0;
+  box-sizing: border-box;
+  font-size: 18px;
+}
+
+.carotid-plan .slide-body.dense {
+  justify-content: center;
+}
+
+.carotid-plan .kicker {
+  margin: 0 0 16px;
+  color: var(--accent);
+  font-family: var(--font-mono, monospace);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.carotid-plan .h1 {
+  margin: 0;
+  font-size: clamp(54px, 5.8vw, 88px);
+  line-height: 1.03;
+  letter-spacing: -.055em;
+}
+
+.carotid-plan .h2 {
+  margin: 0;
+  font-size: clamp(40px, 4vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.carotid-plan .lede {
+  color: var(--text-2);
+  font-size: 22px;
+  line-height: 1.55;
+}
+
+.carotid-plan .accent {
+  color: var(--accent);
+}
+
+.carotid-plan .card {
+  padding: 26px 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.carotid-plan .card h3,
+.carotid-plan .card h4 {
+  margin: 0 0 12px;
+}
+
+.carotid-plan .card p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.carotid-plan .metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.carotid-plan .metric-card {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .metric-value {
+  display: block;
+  color: var(--accent);
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+
+.carotid-plan .metric-label {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-2);
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.carotid-plan .flow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 34px;
+  align-items: stretch;
+}
+
+.carotid-plan .flow-step {
+  position: relative;
+  padding: 24px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .flow-step:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  top: 50%;
+  right: -28px;
+  color: var(--accent);
+  font-size: 30px;
+  font-weight: 900;
+  transform: translateY(-50%);
+}
+
+.carotid-plan .flow-num {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+}
+
+.carotid-plan .flow-step b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.carotid-plan .flow-step p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.carotid-plan .split-grid {
+  display: grid;
+  grid-template-columns: 7fr 2fr 2fr;
+  gap: 18px;
+}
+
+.carotid-plan .split-card {
+  padding: 28px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .split-card.primary {
+  border-color: var(--accent);
+}
+
+.carotid-plan .split-count {
+  color: var(--accent);
+  font-size: 70px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.carotid-plan .split-card ul {
+  margin: 18px 0 0;
+  padding-left: 20px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.carotid-plan .grade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.carotid-plan .grade-card {
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-top: 6px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .grade-card:nth-child(2) {
+  border-top-color: var(--warn);
+}
+
+.carotid-plan .grade-card:nth-child(3) {
+  border-top-color: var(--bad);
+}
+
+.carotid-plan .grade-letter {
+  font-size: 54px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.carotid-plan .pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.carotid-plan .pipeline-card {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .pipeline-card strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 17px;
+}
+
+.carotid-plan .pipeline-card p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.carotid-plan .model-box {
+  padding: 34px;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .model-name {
+  color: var(--accent);
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: -.04em;
+}
+
+.carotid-plan .reason-list {
+  display: grid;
+  gap: 14px;
+}
+
+.carotid-plan .reason {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.carotid-plan .reason span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 900;
+}
+
+.carotid-plan .reason b {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.carotid-plan .reason p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 18px;
+}
+
+.carotid-plan .experiment-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 110px;
+  gap: 20px;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.carotid-plan .experiment-row:first-child {
+  border-top: 1px solid var(--border);
+}
+
+.carotid-plan .experiment-count {
+  color: var(--accent);
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+}
+
+.carotid-plan .experiment-row small {
+  color: var(--text-3);
+  font-size: 17px;
+  text-align: right;
+}
+
+.carotid-plan .target-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.carotid-plan .target {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .target strong {
+  display: block;
+  color: var(--accent);
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.carotid-plan .target span {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-2);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.carotid-plan .decision-list {
+  display: grid;
+  gap: 18px;
+}
+
+.carotid-plan .decision {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 22px;
+  align-items: center;
+  padding: 22px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .decision-num {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.carotid-plan .decision h3 {
+  margin: 0 0 6px;
+  font-size: 23px;
+}
+
+.carotid-plan .decision p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 18px;
+}
+
+.carotid-plan .mini-note {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.carotid-plan .slide-footer {
+  position: absolute;
+  right: 92px;
+  bottom: 40px;
+  left: 92px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-3);
+  font-family: var(--font-mono, monospace);
+  font-size: 16px;
+}
+
+.carotid-plan .footnote {
+  color: var(--text-3);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.carotid-plan .identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  color: var(--text-2);
+  font-size: 19px;
+}
+
+.carotid-plan .identity strong {
+  color: var(--text-1);
+  font-size: 22px;
+}
+
+.carotid-plan .cover-statement {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 760px);
+  gap: 22px;
+  align-items: start;
+  max-width: 980px;
+  padding: 22px 26px;
+  border-left: 5px solid var(--accent);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 20px;
+  line-height: 1.55;
+}
+
+.carotid-plan .cover-statement strong {
+  color: var(--text-1);
+}
+
+.carotid-plan .slide-intro {
+  max-width: 1180px;
+  margin: 18px 0 0;
+  color: var(--text-2);
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.carotid-plan .identity-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.carotid-plan .goal-quote {
+  padding: 32px 36px;
+  border-left: 6px solid var(--accent);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  background: var(--surface);
+  color: var(--text-1);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.carotid-plan .evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.carotid-plan .evidence-grid.four {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.carotid-plan .evidence-card {
+  padding: 24px 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .evidence-card strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 25px;
+  line-height: 1.2;
+}
+
+.carotid-plan .evidence-card p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.carotid-plan .evidence-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  font-size: 17px;
+}
+
+.carotid-plan .evidence-table th,
+.carotid-plan .evidence-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.carotid-plan .evidence-table th {
+  color: var(--text-1);
+  background: var(--surface-2);
+  font-weight: 800;
+}
+
+.carotid-plan .evidence-table td {
+  color: var(--text-2);
+}
+
+.carotid-plan .evidence-table tr:last-child td {
+  border-bottom: none;
+}
+
+.carotid-plan .evidence-table.compact th,
+.carotid-plan .evidence-table.compact td {
+  padding: 9px 12px;
+  font-size: 17px;
+}
+
+.carotid-plan .evidence-chain {
+  display: grid;
+  grid-template-columns: 1fr 56px 1fr 56px 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.carotid-plan .chain-arrow {
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.carotid-plan .source-strip {
+  margin-top: 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  color: var(--text-3);
+  font-family: var(--font-mono, monospace);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.carotid-plan .reason-box {
+  padding: 18px 20px;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.carotid-plan .reason-box strong {
+  color: var(--text-1);
+}
+
+.carotid-plan .two-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.carotid-plan .panel {
+  padding: 26px 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .panel h3 {
+  margin: 0 0 14px;
+  font-size: 24px;
+}
+
+.carotid-plan .panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.carotid-plan .numbered-list {
+  display: grid;
+  gap: 12px;
+}
+
+.carotid-plan .numbered-item {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.carotid-plan .numbered-item:last-child {
+  border-bottom: none;
+}
+
+.carotid-plan .numbered-item > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 900;
+}
+
+.carotid-plan .numbered-item b {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.carotid-plan .numbered-item p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.carotid-plan .risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 20px;
+}
+
+.carotid-plan .risk-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 18px;
+  padding: 15px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.carotid-plan .risk-row strong {
+  color: var(--text-1);
+}
+
+.carotid-plan .risk-row span {
+  color: var(--text-2);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.carotid-plan .formula {
+  padding: 18px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-family: var(--font-mono, monospace);
+  font-size: 24px;
+  text-align: center;
+}
+
+.carotid-plan .visual-overview {
+  margin-top: 24px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.carotid-plan .visual-overview img {
+  display: block;
+  width: 100%;
+  height: 330px;
+  object-fit: contain;
+}
+
+.carotid-plan .image-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.carotid-plan .image-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.carotid-plan .image-card img {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background: #050505;
+}
+
+.carotid-plan .image-card figcaption {
+  padding: 15px 17px 17px;
+}
+
+.carotid-plan .image-card strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-1);
+  font-size: 20px;
+}
+
+.carotid-plan .image-card span {
+  display: block;
+  color: var(--text-2);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.carotid-plan .media-split {
+  display: grid;
+  grid-template-columns: 430px 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.carotid-plan .media-split > img {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: #050505;
+}
+
+.carotid-plan .key-hint {
+  position: fixed;
+  right: 14px;
+  bottom: 10px;
+  z-index: 100;
+  color: var(--text-3);
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+@media (max-width: 1000px) {
+  .carotid-plan .flow {
+    gap: 10px;
+  }
+}

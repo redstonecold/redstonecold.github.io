@@ -94,7 +94,10 @@
 } /* Name.Function */
 .highlight .nl {
   color: #d0d0d0;
-} /* Name.Label */ /* Name.Namespace */ /* Name.Other */
+} /* Name.Label */ /* Name.Namespace */
+.highlight .nx {
+  color: #d0d0d0;
+} /* Name.Other */
 .highlight .py {
   color: #d0d0d0;
 } /* Name.Property */
@@ -120,7 +123,10 @@
 } /* Literal.Number.Oct */ /* Literal.String.Backtick */ /* Literal.String.Char */ /* Literal.String.Doc */ /* Literal.String.Double */ /* Literal.String.Escape */
 .highlight .sh {
   color: #ed9d13;
-} /* Literal.String.Heredoc */ /* Literal.String.Interpol */ /* Literal.String.Other */ /* Literal.String.Regex */ /* Literal.String.Single */ /* Literal.String.Symbol */
+} /* Literal.String.Heredoc */ /* Literal.String.Interpol */ /* Literal.String.Other */ /* Literal.String.Regex */ /* Literal.String.Single */
+.highlight .ss {
+  color: #ed9d13;
+} /* Literal.String.Symbol */
 .highlight .bp {
   color: #24909d;
 } /* Name.Builtin.Pseudo */ /* Name.Variable.Class */ /* Name.Variable.Global */

@@ -140,6 +140,18 @@ body > #header .header-bar {
   background: #1e1e1e;
 }
 
+#menubar,
+div#menubar {
+  background-color: #1e1e1e;
+  padding-top: 0px !important;
+}
+
+#menubar .navbar {
+  background-color: #1e1e1e;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
 .navbar {
   border: none;
 }
